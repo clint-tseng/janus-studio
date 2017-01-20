@@ -1,0 +1,35 @@
+{
+  "name": "janus-studio",
+  "private": true,
+  "description": "an interactive development console for janus",
+  "version": "0.1.0",
+  "author": "Clint Tseng <clint@dontexplain.com>",
+  "homepage": "http://janusjs.org",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/clint-tseng/janus-studio.git"
+  },
+  "bugs": {
+    "url": "https://github.com/clint-tseng/janus-studio/issues"
+  },
+  "license": "WTFPL",
+  "main": "lib/shell",
+  "scripts": {
+    "test": "make test"
+  },
+  "engines": {
+    "node": ">= 6.0"
+  },
+  "keywords": [ "framework", "server-side", "mvvm", "frp", "rx", "application", "508", "seo" ],
+  "dependencies": {
+    "janus": "~0.3",
+    "janus-stdlib": "~0.2.1",
+    "jquery": "~3.1"
+  },
+  "devDependencies": {
+    "coffee-script": "~1.11",
+    "node-sass": "~3",
+    "mocha": "~3",
+    "should": "~11"
+  }
+}
