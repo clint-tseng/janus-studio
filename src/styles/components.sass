@@ -1,0 +1,118 @@
+@import 'common'
+@import 'util'
+
+.modelView
+  background-color: #f7f7f7
+  border-radius: 0.2em
+  border-left: 2px solid #c70c83
+  position: relative
+
+  //temp:
+  margin: 3em
+  width: 40em
+
+  .modelView-toolbar
+    @include fill
+    bottom: auto
+    overflow: hidden
+    padding: 0.5em
+    position: absolute
+    top: 0
+
+    > div
+      float: right
+
+  .modelView-title
+    background-color: #ddd
+    border-radius: 0.2em
+    display: inline-block
+    font-weight: bold
+    padding: 0.5em 0.7em
+
+  .modelView-pairs
+    padding: 1.5em
+      top: 1em
+
+  .kvPair
+    overflow: hidden
+    padding: 0.3em 0
+
+  .kvPair-key
+    float: left
+    font-size: 1.2em
+    font-weight: bold
+    padding-right: 0.8em
+
+  &.align-aligned .kvPair-key
+    overflow: hidden
+    text-overflow: ellipsis
+    width: 25%
+
+  .kvPair-valueBlock
+    $font-size: 1.2em
+    overflow: hidden
+    position: relative
+
+    .janus-literal
+      font-size: $font-size
+
+    .kvPair-edit input
+      @include bare-textbox
+      @include fill
+      background: #fff
+      border-radius: 0.2em
+      font-size: $font-size
+      opacity: 0
+      pointer-events: none
+      top: -0.1em
+      width: 100%
+      &.focus
+        opacity: 1
+        pointer-events: auto
+
+.toggleButtons
+  $background: #ddd
+  background: $background
+  border-radius: 0.2em
+  overflow: hidden
+
+  li
+    float: left
+    font-size: 1.33333em
+    height: 1em
+    padding: 0.4em
+      bottom: 0.2em
+    position: relative
+    width: 1em
+
+    button
+      @include fill
+      opacity: 0
+      z-index: 1
+
+    .icon
+      opacity: 0.3
+    &:hover .icon
+      opacity: 1
+    .checked .icon
+      opacity: 1
+
+  &.ephemeral
+    background: transparent
+    &:hover
+      background: $background
+
+      li
+        .icon
+          opacity: 0.3
+        .checked .icon
+          opacity: 1
+
+    li
+      .icon
+        opacity: 0.05
+      &:hover .icon
+        opacity: 0.7
+      .checked .icon
+        opacity: 0.4
+

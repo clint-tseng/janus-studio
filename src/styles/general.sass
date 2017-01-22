@@ -1,5 +1,13 @@
 @import 'common'
 
+// fonts.
+@font-face
+  font-family: 'FontAwesome'
+  src: url('assets/fonts/fontawesome-webfont.woff2?v=4.7.0') format('woff2')
+  font-weight: normal
+  font-style: normal
+
+// base styles.
 body
   color: #222
   font-family: $font
@@ -10,4 +18,17 @@ input
 
 .hide
   display: none !important
+
+// icons.
+.icon
+  display: inline-block
+  font: normal normal normal 14px/1 FontAwesome
+  font-size: inherit
+  text-rendering: auto
+  -webkit-font-smoothing: antialiased
+
+.icon-natural:before
+  content: "\f036"
+.icon-aligned:before
+  content: "\f039"
 

@@ -21,6 +21,7 @@ lib/assets: lib
 	mkdir lib/assets
 
 lib/assets/%: src/assets/% lib/assets
+	@[[ -d "$(@D)" ]] || mkdir -p "$(@D)"
 	cp $< $@
 
 node_modules:
