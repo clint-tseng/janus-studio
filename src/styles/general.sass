@@ -21,14 +21,12 @@ input
 
 // icons.
 .icon
-  display: inline-block
-  font: normal normal normal 14px/1 FontAwesome
-  font-size: inherit
-  text-rendering: auto
-  -webkit-font-smoothing: antialiased
+  @include icon
 
 .icon-natural:before
-  content: "\f036"
+  content: $icon-natural
 .icon-aligned:before
-  content: "\f039"
+  content: $icon-aligned
+.icon-plug:before
+  content: $icon-plug
 

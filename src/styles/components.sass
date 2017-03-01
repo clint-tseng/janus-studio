@@ -1,37 +1,55 @@
 @import 'common'
 @import 'util'
 
-.modelView
-  background-color: #f7f7f7
+.panel
+  $sidebar-width: 16em
+
+  background-color: $color-panel-bg
   border-radius: 0.2em
-  border-left: 2px solid #c70c83
+  border-left: 2px solid #777
   position: relative
 
   //temp:
   margin: 3em
-  width: 40em
+  width: 45em
 
-  .modelView-toolbar
+  .panel-toolbar
     @include fill
     bottom: auto
     overflow: hidden
     padding: 0.5em
     position: absolute
     top: 0
+    z-index: 1
 
-    > div
-      float: right
-
-  .modelView-title
+  .panel-title
     background-color: #ddd
     border-radius: 0.2em
-    display: inline-block
     font-weight: bold
+    left: 0
     padding: 0.5em 0.7em
+    position: absolute
+    top: 0
 
-  .modelView-pairs
+  .panel-main
     padding: 1.5em
-      top: 1em
+      top: 3em
+
+  &.hasSidebar .panel-main
+    padding-right: $sidebar-width
+  .panel-sidebar
+    $sidebar-padding: 1em
+
+    @include fill
+    background-color: #f0f0f0
+    border-radius: 0 0.2em 0.2em 0
+    left: auto
+    padding: $sidebar-padding
+      top: 4em
+    width: $sidebar-width - (2 * $sidebar-padding)
+
+.modelView
+  border-left-color: #c70c83
 
   .kvPair
     overflow: hidden
@@ -42,6 +60,10 @@
     font-size: 1.2em
     font-weight: bold
     padding-right: 0.8em
+
+    &:after
+      content: ':'
+      font-weight: normal
 
   &.align-aligned .kvPair-key
     overflow: hidden
@@ -70,10 +92,10 @@
         opacity: 1
         pointer-events: auto
 
-.toggleButtons
-  $background: #ddd
-  background: $background
+@mixin panel-toolpane
+  background: transparent
   border-radius: 0.2em
+  float: right
   overflow: hidden
 
   li
@@ -85,34 +107,384 @@
     position: relative
     width: 1em
 
+  &:hover
+    background: $color-panel-toolpane-bg
+
+.toggleButtons
+  @include panel-toolpane
+
+  li
     button
       @include fill
       opacity: 0
       z-index: 1
 
     .icon
+      opacity: 0.05
+    .checked .icon
+      opacity: 0.4
+
+  &:hover li
+    .icon
       opacity: 0.3
     &:hover .icon
-      opacity: 1
+      opacity: 0.7
     .checked .icon
       opacity: 1
 
-  &.ephemeral
-    background: transparent
-    &:hover
-      background: $background
+.toggleSwitch
+  @include panel-toolpane
+
+  .icon-plug
+    opacity: 0.4
+
+  .switch
+    padding: 0.3em 0.6em 0 0.1em
+
+    button
+      @include bare-button
+      opacity: 0.2
+
+      &:before
+        @include reify
+        @include icon
+        content: $icon-toggle-off
+        font-size: 1.3em
+
+  &:hover
+    .icon-plug
+      opacity: 0.7
+    .switch button
+      opacity: 0.7
+
+  &.checked
+    .icon-plug
+      color: $color-active
+      opacity: 1
+    .switch button
+      opacity: 1
+      &:before
+        content: $icon-toggle-on
+
+.varyingTreeView
+  $node-size: 2.8em
+  $node-border-width: 0.2em
+  $node-outer-size: $node-size + ($node-border-width * 2)
+  $node-outer-radius: $node-outer-size / 2
+  $inner-size: 2em
+  $value-size: 1.4em
+  $lambda-size: 1.4em
+
+  $active-color: #08a4ec
+  $inactive-color: #555
+  $value-color: #85d316
+  $inner-color: #999
+
+  .main
+    &:after
+      @include reify
+      clear: both
+
+    .node
+      background-color: $color-panel-bg
+      border: $node-border-width solid $active-color
+      border-radius: $node-size
+      float: left
+      height: $node-size
+      margin-right: 1em
+      position: relative
+      width: $node-size
+      z-index: 1
+
+      .inner-marker
+        $border-size: 0.2em
+        $centering: ($node-size / 2) - ($inner-size / 2) - $border-size
+        border: $border-size solid $inner-color
+        border-radius: $inner-size
+        display: none
+        height: $inner-size
+        left: $centering
+        position: absolute
+        top: $centering
+        width: $inner-size
+
+        &:after
+          $length: 2.5em
+          $dist-x: $sin-45 * (($inner-size / 2) + ($length / 2))
+          $dist-y: $sin-45 * (($inner-size / 2) - (2 * $border-size))
+
+          @include reify
+          background: linear-gradient(0deg, $active-color, $inner-color)
+          height: $length
+          left: ($inner-size / 2) + $dist-x
+          position: absolute
+          top: ($inner-size / 2) + $dist-y
+          transform: rotate(-45deg)
+          width: 0.2em
+
+      .value-marker
+        $centering: ($node-size / 2) - ($value-size / 2)
+        background: $value-color
+        border-radius: $value-size
+        height: $value-size
+        left: $centering
+        opacity: 0.3
+        position: absolute
+        top: $centering
+        width: $value-size
+
+        &:after
+          @include reify
+          border-bottom: 1px solid $value-color
+          display: none
+          height: 0
+          left: 100%
+          position: absolute
+          top: $value-size / 2
+          width: 1.6em
+
+    .title
+      font-weight: bold
+
+    .tags
+      float: left
 
       li
-        .icon
-          opacity: 0.3
-        .checked .icon
-          opacity: 1
+        background: #999
+        border-radius: 0.3em
+        color: #fff
+        float: left
+        font-size: 0.8em
+        letter-spacing: -0.05em
+        margin: 0.1em
+          right: 0.5em
+        padding: 0.2em 0.4em
+        text-transform: uppercase
 
-    li
-      .icon
-        opacity: 0.05
-      &:hover .icon
-        opacity: 0.7
-      .checked .icon
-        opacity: 0.4
+    .value
+      font-size: 1.2em
+      padding-top: 0.1em
+
+      // TODO: how do i organize this file?
+      // showing reaction chain:
+      > .janus-list > li
+        background-color: $color-highlight-bg
+        float: left
+
+        + li .reactionStep .oldValue
+          display: none
+
+  &.hasInner > .main .inner-marker
+    display: block
+  &.hasValue > .main .value-marker
+    opacity: 1
+    &:after
+      display: block
+  &.flattened > .main .node
+    border-style: dotted
+
+  .aux
+    display: none
+    padding-top: 0.2em
+    position: relative
+
+    &:before
+      @include reify
+      border-left: 1px solid $inactive-color
+      bottom: -1em
+      left: ($node-outer-size / 2)
+      position: absolute
+      top: 0
+      width: 0
+      z-index: 2
+
+    .varyingTreeView-inner
+      margin-top: 0.3em
+      padding-left: 3.5em
+      position: relative
+      z-index: 1
+
+    .mapping
+      background-color: $inactive-color
+      border-radius: $lambda-size
+      clear: both
+      color: #fff
+      display: none
+      font-weight: bold
+      height: $lambda-size
+      line-height: 1.2em
+      margin-left: $node-outer-radius - ($lambda-size / 2)
+      position: relative
+      text-align: center
+      width: $lambda-size
+      z-index: 3
+
+      span
+        font-size: 0.9em
+
+  .varyingTreeView-next
+    margin-top: 1em
+
+  $indent: 1em
+  $slant-length: 1em
+  $slant-offset: $slant-length * $cos-45
+  .linkedList-node
+    .linkedList-next.hasNext
+      margin-left: $node-outer-size / 2
+      margin-bottom: -1 * $slant-offset
+      padding-left: $indent
+      position: relative
+
+      &:before
+        @include reify
+        border-top: 1px solid $inactive-color
+        left: -1 * $slant-offset
+        position: absolute
+        top: 0
+        width: $indent + $node-outer-radius
+
+      .linkedList-node:before
+          @include reify
+          border-left: 1px solid $inactive-color
+          bottom: -1em
+          left: 0
+          position: absolute
+          top: $slant-offset
+
+      &:after
+        $offset: ($slant-length * $cos-45) / 2
+        @include reify
+        border-left: 1px solid $inactive-color
+        height: $slant-length
+        left: $indent + $node-outer-radius - $offset
+        top: -1px
+        transform: rotate(-45deg)
+        position: absolute
+
+    .linkedList-contents
+      padding-top: $slant-offset
+
+  .varyingTreeView-nexts > .linkedList
+    margin-top: -1 * ($lambda-size / 2 + 1em)
+
+    > .linkedList-node > .linkedList-next.hasNext
+      &:before
+        left: 0
+        width: $indent + $node-outer-radius - $slant-offset
+      > .linkedList-node:before
+        top: 0
+
+  &.mapped > .aux
+    .mapping
+      display: block
+    &:after
+      @include reify
+      background: $inactive-color
+      bottom: $lambda-size / 2
+      //clip-path: url(#lambda) # someday, maybe
+      left: $node-outer-radius - ($lambda-size / 2)
+      opacity: 0.4
+      position: absolute
+      top: -0.3em
+      width: $lambda-size
+
+  &.derived > .aux
+    display: block
+
+  &.derived > .main .node
+    border-color: $inactive-color
+    .inner-marker:after
+      background: linear-gradient(0deg, $inactive-color, $inner-color)
+  &.derived.hasObservations
+    > .main .node
+      border-color: $active-color
+      .inner-marker:after
+        background: linear-gradient(0deg, $active-color, $inner-color)
+    > .aux
+      &:before
+        border-left-color: $active-color
+      .mapping
+        background-color: $active-color
+      &:after
+        background: $active-color
+    .linkedList-next.hasNext
+      &:before
+        border-top-color: $active-color
+      .linkedList-node:before
+        border-left-color: $active-color
+      &:after
+        border-left-color: $active-color
+
+  &.hasValue > .aux:before
+    top: ($node-size - $value-size) / -2 - $node-border-width
+  &.hasInner > .aux:before
+    top: ($node-size - $inner-size) / -2
+
+.reaction
+  .upper, .lower
+    overflow: hidden
+  .upper
+    margin-bottom: 0.4em
+
+  .uid, .root
+    float: left
+  .time, .changes
+    float: right
+
+  .uid
+    font-weight: bold
+  .time
+    font-size: 0.9em
+    opacity: 0.7
+
+  .root
+    font-size: 1.3em
+
+  .changes
+    background: #999
+    border-radius: 0.2em
+    color: #fff
+    margin-top: 0.2em
+    padding: 0.2em 0.3em
+
+    .icon:before
+      content: $icon-share
+
+.reactionStep
+  overflow: hidden
+
+  > div
+    float: left
+    margin-right: 0.2em
+
+  .separator
+    &:before
+      @include icon
+      content: $icon-arrow-right
+      font-size: 0.8em
+
+.varyingView
+  .varyingView-reactions li
+    padding: 0.6em 0
+
+    &:nth-child(2n)
+      background: #ddd
+      margin: 0 -1em
+      padding: 0.6em 1em
+
+    .reactionStep
+      line-height: 1.4em
+      .separator
+        line-height: 1.3em
+
+.janus-null
+  opacity: 0.5
+
+.janus-varying
+  display: inline-block
+  .janus-varying-contents
+    display: inline-block
+
+.janus-debug-static
+  font-family: menlo, consolas
 

@@ -31,14 +31,7 @@ class KVPairView extends DomView
   @_template: template(
     find('.kvPair-key').text(from('key'))
     find('.kvPair-key').attr('title', from('key'))
-    find('.kvPair-value').render(from('model').and('key').all.flatMap((m, k) ->
-      m.watch(k).map((x) ->
-        if isPrimitive(x) or isArray(x)
-          JSON.stringify(x)
-        else
-          x
-      )
-    )).context('debug')
+    find('.kvPair-value').render(from('model').and('key').all.flatMap((m, k) -> m.watch(k))).context('debug')
     find('.kvPair-edit').render(from.attribute('edit')).context('edit').find( attributes: { commit: 'hard' } )
   )
 
@@ -58,12 +51,12 @@ class ModelViewModel extends Model
 class ModelView extends DomView
   @viewModelClass: ModelViewModel
   @_dom: -> $('
-    <div class="modelView">
-      <div class="modelView-toolbar">
-        <div class="modelView-alignToggle toggleButtons ephemeral"></div>
+    <div class="modelView panel">
+      <div class="panel-toolbar">
+        <div class="modelView-alignToggle toggleButtons"></div>
       </div>
-      <div class="modelView-title"></div>
-      <div class="modelView-pairs"></div>
+      <div class="panel-title"></div>
+      <div class="panel-main modelView-pairs"></div>
     </div>
   ')
   @_template: template(
@@ -73,7 +66,7 @@ class ModelView extends DomView
       .options( renderItem: (x) -> x.context('icon') )
     find('.modelView').classGroup('align-', from('alignMode'))
 
-    find('.modelView-title').text(from('subject').map((x) -> x.constructor.name))
+    find('.panel-title').text(from('subject').map((x) -> x.constructor.name))
     find('.modelView-pairs').render(from('pairs'))
   )
 
@@ -82,6 +75,6 @@ module.exports = {
 
   registerWith: (library) ->
     library.register(KVPair, KVPairView)
-    library.register(Model, ModelView, context: 'debug')
+    library.register(Model, ModelView, context: 'debug-pane')
 }
 
