@@ -49,6 +49,9 @@ class WrappedVarying extends Model
     # listen to our parent's reactions if we've got one.
     self._trackReactions(WrappedVarying.hijack(varying._parent)) if varying._parent?
 
+    # listen to all our parents' reactions if we've got many.
+    self._trackReactions(WrappedVarying.hijack(x)) for x in varying._applicants if varying._applicants?
+
     # VALUE TRACKING:
     # grab the current value, populate.
     self.set('_value', varying._value)
