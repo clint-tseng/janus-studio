@@ -14,8 +14,8 @@ class Reaction extends Model
   _initialize: ->
     this.set('at', new Date())
 
-  logStep: (wrappedVarying, newValue, oldValue, flattened = false) ->
-    step = new ReactionStep({ target: wrappedVarying, newValue, oldValue, flattened })
+  logStep: (wrappedVarying, newValue, oldValue) ->
+    step = new ReactionStep({ target: wrappedVarying, newValue, oldValue })
     this.set("lookup.#{wrappedVarying.get('id')}", step)
     this.get('steps').add(step)
 

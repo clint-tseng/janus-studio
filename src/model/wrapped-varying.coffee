@@ -39,11 +39,13 @@ class WrappedVarying extends Model
     if (_react = varying._react)?
       varying._react = (f_, immediate) ->
         observation = _react.call(varying, f_, immediate)
+        self.unset('parent_reaction')
         addObservation(observation)
         observation
     else
       varying.react = (f_) ->
         observation = Varying.prototype.react.call(varying, f_)
+        self.unset('parent_reaction')
         addObservation(observation)
         observation
 
@@ -62,9 +64,7 @@ class WrappedVarying extends Model
     # record a Reaction.
     if (_set = varying.set)?
       varying.set = (value) ->
-        rxn = new Reaction( caller: arguments.callee.caller )
-        self.get('reactions').add(rxn)
-        rxn.logStep(self, value, self.get('value'))
+        rxn = self._startReaction(value, arguments.callee.caller)
 
         self.set('_value', value)
 
@@ -75,17 +75,13 @@ class WrappedVarying extends Model
     # for derived varyings, hijack the _onValue method instead.
     if (_onValue = varying._onValue)?
       varying._onValue = (observation, value, silent) ->
-        if (extantRxn = self.get('active_reactions').at(0))?
-          extantRxn.logStep(self, value, self.get('value'), observation isnt varying._parentObservation)
+        if (extantRxn = (self.get('active_reactions').at(0) ? self.unset('parent_reaction')))?
+          extantRxn.logStep(self, value, self.get('value'))
         else
           # nothing has been set, but by virtue of a new observation we are now
           # computing what was previously not. create a reaction.
-          newRxn = new Reaction( caller: arguments.callee.caller )
-          self.get('reactions').add(newRxn)
-          newRxn.logStep(self, value, self.get('value'))
-
-          # TODO: should never happen; remove once we're sure we've made that true.
-          #console.error('Tried to log a reaction step but no active reaction was found.', self, value)
+          # TODO: is this always true, or are there other causes for this branch?
+          newRxn = self._startReaction(value, arguments.callee.caller)
 
         if varying._flatten is true
           if observation is varying._parentObservation
@@ -95,6 +91,7 @@ class WrappedVarying extends Model
             if value?.isVarying is true
               self.set('inner', value)
               self._trackReactions(value)
+              WrappedVarying.hijack(value).set('parent_reaction', extantRxn ? newRxn)
             else
               self.unset('inner')
           else
@@ -138,6 +135,12 @@ class WrappedVarying extends Model
   @bind('value', from('_value').map((x) -> if x?.isNothing is true then null else x))
 
   @bind('active_reactions', from('reactions').map((rxns) -> rxns.filter((rxn) -> rxn.watch('active'))))
+
+  _startReaction: (newValue, caller) ->
+    rxn = new Reaction({ caller })
+    this.get('reactions').add(rxn)
+    rxn.logStep(this, newValue, this.get('value'))
+    rxn
 
   # for now, naively assume this is the only cross-WV listener to simplify tracking.
   _trackReactions: (other) -> this.listenTo(WrappedVarying.hijack(other).get('reactions'), 'added', (r) => this.get('reactions').add(r))
