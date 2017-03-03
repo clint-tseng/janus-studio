@@ -5,6 +5,8 @@
 
 
 class WrappedVarying extends Model
+  isWrappedVarying: true
+
   constructor: (@varying) ->
     super({
       id: uniqueId()
@@ -47,10 +49,10 @@ class WrappedVarying extends Model
 
     # REACTION TRACKING:
     # listen to our parent's reactions if we've got one.
-    self._trackReactions(WrappedVarying.hijack(varying._parent)) if varying._parent?
+    self._trackReactions(varying._parent) if varying._parent?
 
     # listen to all our parents' reactions if we've got many.
-    self._trackReactions(WrappedVarying.hijack(x)) for x in varying._applicants if varying._applicants?
+    self._trackReactions(x) for x in varying._applicants if varying._applicants?
 
     # VALUE TRACKING:
     # grab the current value, populate.
@@ -88,11 +90,11 @@ class WrappedVarying extends Model
         if varying._flatten is true
           if observation is varying._parentObservation
             # we have a potentially new value at the top level; change what we are tracking.
-            self._untrackReactions(oldInner._wrapper) if (oldInner = self.get('inner'))?
+            self._untrackReactions(oldInner) if (oldInner = self.get('inner'))?
 
             if value?.isVarying is true
               self.set('inner', value)
-              self._trackReactions(WrappedVarying.hijack(value))
+              self._trackReactions(value)
             else
               self.unset('inner')
           else
@@ -138,10 +140,10 @@ class WrappedVarying extends Model
   @bind('active_reactions', from('reactions').map((rxns) -> rxns.filter((rxn) -> rxn.watch('active'))))
 
   # for now, naively assume this is the only cross-WV listener to simplify tracking.
-  _trackReactions: (other) -> this.listenTo(other.get('reactions'), 'added', (r) => this.get('reactions').add(r))
-  _untrackReactions: (other) -> this.unlistenTo(other)
+  _trackReactions: (other) -> this.listenTo(WrappedVarying.hijack(other).get('reactions'), 'added', (r) => this.get('reactions').add(r))
+  _untrackReactions: (other) -> this.unlistenTo(WrappedVarying.hijack(other))
 
-  @hijack: (varying) -> varying._wrapper ?= new WrappedVarying(varying)
+  @hijack: (varying) -> if varying.isWrappedVarying is true then varying else varying._wrapper ?= new WrappedVarying(varying)
 
 module.exports = { WrappedVarying }
 
