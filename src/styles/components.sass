@@ -271,9 +271,6 @@
         background-color: $color-highlight-bg
         float: left
 
-        + li .reactionStep .oldValue
-          display: none
-
   &.hasInner > .main .inner-marker
     display: block
   &.hasValue > .main .value-marker
@@ -428,7 +425,7 @@
 
   .uid, .root
     float: left
-  .time, .changes
+  .time
     float: right
 
   .uid
@@ -440,29 +437,6 @@
   .root
     font-size: 1.3em
 
-  .changes
-    background: #999
-    border-radius: 0.2em
-    color: #fff
-    margin-top: 0.2em
-    padding: 0.2em 0.3em
-
-    .icon:before
-      content: $icon-share
-
-.reactionStep
-  overflow: hidden
-
-  > div
-    float: left
-    margin-right: 0.2em
-
-  .separator
-    &:before
-      @include icon
-      content: $icon-arrow-right
-      font-size: 0.8em
-
 .varyingView
   .varyingView-reactions li
     padding: 0.6em 0
@@ -471,11 +445,6 @@
       background: #ddd
       margin: 0 -1em
       padding: 0.6em 1em
-
-    .reactionStep
-      line-height: 1.4em
-      .separator
-        line-height: 1.3em
 
 .janus-null
   opacity: 0.5

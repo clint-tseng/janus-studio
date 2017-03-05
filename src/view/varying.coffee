@@ -32,6 +32,10 @@ class VaryingTreeView extends DomView
               <li class="tagImmediate">Immediate</li>
             </ul>
             <div class="value"/>
+            <div class="delta">
+              <div class="separator"/>
+              <div class="newValue"/>
+            </div>
           </div>
         </div>
       </div>
@@ -60,30 +64,40 @@ class VaryingTreeView extends DomView
     find('.title .className').text(from('title'))
     find('.title .uid').text(from('id').map((x) -> "##{x}"))
 
-    find('.value').render(from('immediate').and('value').and('id').and.app().watch('global').watch('hover')
-      .all.flatMap((immediate, value, id, hover) ->
-        if hover?.isReaction is true
-          hover.watch('steps').flatMap((steps) ->
-            Varying.managed(
-              (-> steps.filter((step) -> step.watch('target').flatMap((target) -> target.watch('id').map((tid) -> tid is id)))),
-              ((matches) -> matches.watchLength().map((ml) -> if ml is 0 then immediate ? value else matches))
-            )
-          )
-        else
-          immediate ? value
-      )).context('debug')
+    find('.value').render(from('immediate').and('value').all.map((i, v) -> v ? i)).context('debug')
+    find('.newValue').render(from('new_value')).context(from('changed').map((changed) -> 'debug' if changed is true))
 
     find('.mapping').attr('title', from('target').map((varying) -> varying._f))
 
-    find('.varyingTreeView-inner').render(from('inner').map((v) -> WrappedVarying.hijack(v) if v?)).context('debug-tree')
-    find('.varyingTreeView-next').render(from('parent').map((v) -> WrappedVarying.hijack(v) if v?)).context('debug-tree')
+    find('.varyingTreeView-inner').render(from('inner').map((v) -> WrappedVarying.hijack(v) if v?)).context('tree')
+    find('.varyingTreeView-next').render(from('parent').map((v) -> WrappedVarying.hijack(v) if v?)).context('tree')
     find('.varyingTreeView-nexts').render(from('parents').map((x) -> x?.map((v) -> WrappedVarying.hijack(v))))
-      .context('linked').options( itemContext: 'debug-tree' )
+      .context('linked').options( itemContext: 'tree' )
   )
 
+
+class VaryingPanel extends Model
+  @attribute('subscribed', attribute.BooleanAttribute)
+
+  @attribute('active_reaction', class extends attribute.EnumAttribute
+    nullable: true
+    values: -> this.model.watch('wrapped').flatMap((wv) -> wv.watch('reactions'))
+    default: -> null
+  )
+
+  @bind('wrapped', from('subject').map((varying) -> WrappedVarying.hijack(varying)))
+
+  _initialize: ->
+    # create or destroy our own hollow observation:
+    this.watch('subscribed').react((subbed) =>
+      if subbed
+        this._observation = this.get('subject').reactNow(->)
+      else
+        this._observation.stop()
+    )
+
 class VaryingView extends DomView
-  # we want something of a viewmodel, but one that's not constructed the standard way, so override:
-  constructor: (varying, options) -> super(WrappedVarying.hijack(varying), options)
+  @viewModelClass: VaryingPanel
 
   @_dom: -> $('
     <div class="varyingView panel hasSidebar">
@@ -94,20 +108,26 @@ class VaryingView extends DomView
         </ul>
       </div>
       <div class="panel-title"></div>
+      <div class="varyingView-clearActive"><span class="icon"/></div>
       <div class="panel-main varyingView-tree"></div>
       <div class="panel-sidebar varyingView-reactions"></div>
     </div>
   ')
   @_template: template(
-    find('.panel-title').text(from('title'))
+    find('.panel-title').text(from('wrapped').watch('title'))
 
     find('.varyingView-subscriptionToggle').classed('checked', from('subscribed'))
     find('.varyingView-subscriptionToggle .switch').render(from.attribute('subscribed'))
       .context('edit').find( attributes: { style: 'button' } )
-    find('.varyingView-tree').render(from.self((v) -> v.subject)).context('debug-tree')
 
-    find('.varyingView-reactions').render(from('reactions'))
+    find('.varyingView-tree').render(from('wrapped').and('active_reaction').all.flatMap((wv, ar) ->
+      if ar? then wv.watch('id').flatMap((id) -> ar.watch("tree.#{id}")) else wv
+    )).context('tree')
+
+    find('.varyingView-reactions').render(from.attribute('active_reaction'))
+      .context('edit').find( attributes: { style: 'list' } )
   )
+
 
 module.exports = {
   VaryingView
@@ -115,7 +135,7 @@ module.exports = {
 
   registerWith: (library) ->
     library.register(Varying, VaryingDebugView, context: 'debug')
-    library.register(WrappedVarying, VaryingTreeView, context: 'debug-tree')
+    library.register(WrappedVarying, VaryingTreeView, context: 'tree')
     library.register(Varying, VaryingView, context: 'debug-pane')
 }
 
