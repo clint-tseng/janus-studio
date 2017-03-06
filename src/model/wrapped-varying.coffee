@@ -196,6 +196,7 @@ class Reaction extends Model
 
     value = new Varying(value._value) if value?.isVarying is true
     snapshot.set({ new_value: value, changed: true })
+    snapshot.unset('immediate')
 
 
 module.exports = { WrappedVarying, SnapshottedVarying, Reaction }
