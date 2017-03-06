@@ -109,16 +109,21 @@ class VaryingView extends DomView
           <li class="switch"></li>
         </ul>
       </div>
-      <div class="panel-title"></div>
+      <div class="panel-title">
+        <div class="varyingView-titleMain"/>
+        <div class="panel-subtitle">
+          <span class="panel-subtitleText"/>
+          <div class="panel-subtitleClose"><span class="icon"/></div>
+        </div>
+      </div>
       <div class="panel-main">
         <div class="varyingView-tree"/>
-        <div class="varyingView-clearActive"><span class="icon"/></div>
       </div>
       <div class="panel-sidebar varyingView-reactions"></div>
     </div>
   ')
   @_template: template(
-    find('.panel-title').text(from('wrapped').watch('title'))
+    find('.varyingView-titleMain').text(from('wrapped').watch('title'))
 
     find('.varyingView-subscriptionToggle').classed('checked', from('subscribed'))
     find('.varyingView-subscriptionToggle .switch').render(from.attribute('subscribed'))
@@ -130,13 +135,13 @@ class VaryingView extends DomView
 
     find('.varyingView-reactions').render(from.attribute('active_reaction'))
       .context('edit').find( attributes: { style: 'list' } )
-    find('.varyingView-clearActive').classed('hide', from('active_reaction').map((ar) -> !ar?))
+
+    find('.panel-subtitle').classed('hide', from('active_reaction').map((ar) -> !ar?))
+    find('.panel-subtitleText').text(from('active_reaction').watch('root').watch('id').map((id) -> "Reaction @##{id}"))
   )
 
   _wireEvents: ->
-    dom = this.artifact()
-
-    dom.find('.varyingView-clearActive').on('click', => this.subject.unset('active_reaction'))
+    this.artifact().find('.panel-subtitleClose').on('click', => this.subject.unset('active_reaction'))
 
 
 module.exports = {

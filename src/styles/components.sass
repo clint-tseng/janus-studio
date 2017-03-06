@@ -30,10 +30,53 @@
     padding: 0.5em 0.7em
     position: absolute
     top: 0
+    z-index: 2
+
+    .panel-subtitle
+      $color-subtitle-bg: #888
+      $chevron-depth: 0.4em
+
+      background: $color-subtitle-bg
+      border-radius: 0 0.2em 0.2em 0
+      color: #fff
+      font-weight: normal
+      left: 100%
+      top: 0
+      padding: inherit
+        right: 2em
+      position: absolute
+      white-space: nowrap
+
+      &:before, &:after
+        @include reify
+        border-left: $chevron-depth solid transparent
+        left: -1 * $chevron-depth
+        position: absolute
+
+      &:before
+        border-top: 1em solid $color-subtitle-bg
+        top: 0
+
+      &:after
+        border-bottom: 1em solid $color-subtitle-bg
+        bottom: 0
+
+      .panel-subtitleClose
+        position: absolute
+        right: 0.5em
+        top: 0.4em
+
+        .icon
+          color: #ddd
+          &:before
+            content: $icon-close
+            font-size: 1.3em
+          &:hover
+            color: #fff
 
   .panel-main
     padding: 1.5em
-      top: 3em
+      top: 3.5em
     position: relative
 
   &.hasSidebar .panel-main
@@ -459,20 +502,6 @@
     font-size: 1.3em
 
 .varyingView
-  .varyingView-clearActive
-    position: absolute
-    right: 1em
-    top: 1em
-    z-index: 2
-
-    .icon
-      color: #777
-      &:before
-        content: $icon-close
-        font-size: 1.3em
-      &:hover
-        color: #333
-
   .varyingView-reactions
     .janus-list-selectItem
       border-left: 0.3em solid transparent
@@ -489,6 +518,9 @@
       &.checked
         border-left-color: $color-active
         background: #fff
+
+      .reaction
+        pointer-events: none
 
     li:nth-child(2n) .janus-list-selectItem
       background: #ddd
