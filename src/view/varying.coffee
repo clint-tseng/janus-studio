@@ -73,6 +73,8 @@ class VaryingTreeView extends DomView
     find('.varyingTreeView-next').render(from('parent').map((v) -> WrappedVarying.hijack(v) if v?)).context('tree')
     find('.varyingTreeView-nexts').render(from('parents').map((x) -> x?.map((v) -> WrappedVarying.hijack(v))))
       .context('linked').options( itemContext: 'tree' )
+
+    find('.valueSection').classed('hasDelta', from('changed'))
   )
 
 
@@ -108,8 +110,10 @@ class VaryingView extends DomView
         </ul>
       </div>
       <div class="panel-title"></div>
-      <div class="varyingView-clearActive"><span class="icon"/></div>
-      <div class="panel-main varyingView-tree"></div>
+      <div class="panel-main">
+        <div class="varyingView-tree"/>
+        <div class="varyingView-clearActive"><span class="icon"/></div>
+      </div>
       <div class="panel-sidebar varyingView-reactions"></div>
     </div>
   ')
@@ -126,7 +130,13 @@ class VaryingView extends DomView
 
     find('.varyingView-reactions').render(from.attribute('active_reaction'))
       .context('edit').find( attributes: { style: 'list' } )
+    find('.varyingView-clearActive').classed('hide', from('active_reaction').map((ar) -> !ar?))
   )
+
+  _wireEvents: ->
+    dom = this.artifact()
+
+    dom.find('.varyingView-clearActive').on('click', => this.subject.unset('active_reaction'))
 
 
 module.exports = {

@@ -34,9 +34,10 @@
   .panel-main
     padding: 1.5em
       top: 3em
+    position: relative
 
   &.hasSidebar .panel-main
-    padding-right: $sidebar-width
+    margin-right: $sidebar-width
   .panel-sidebar
     $sidebar-padding: 1em
 
@@ -246,29 +247,49 @@
     .title
       font-weight: bold
 
-    .tags
-      float: left
+    .valueSection
+      overflow: hidden
 
-      li
-        background: #999
-        border-radius: 0.3em
-        color: #fff
+      &.hasDelta
+        > div
+          background-color: $color-highlight-bg
+        .delta
+          display: block
+
+      .tags
         float: left
-        font-size: 0.8em
-        letter-spacing: -0.05em
-        margin: 0.1em
-          right: 0.5em
-        padding: 0.2em 0.4em
-        text-transform: uppercase
 
-    .value
-      font-size: 1.2em
-      padding-top: 0.1em
+        li
+          background: #999
+          border-radius: 0.3em
+          color: #fff
+          float: left
+          font-size: 0.8em
+          letter-spacing: -0.05em
+          margin: 0.1em
+            right: 0.5em
+          padding: 0.2em 0.4em
+          text-transform: uppercase
 
-      // TODO: how do i organize this file?
-      // showing reaction chain:
-      > .janus-list > li
-        background-color: $color-highlight-bg
+      .value
+        float: left
+        font-size: 1.2em
+        padding-top: 0.1em
+
+      .delta
+        display: none
+        float: left
+        font-size: 1.2em
+        padding-top: 0.1em
+
+      .separator
+        @include icon
+        float: left
+        padding: 0 0.2em
+        &:before
+          content: $icon-arrow-right
+
+      .newValue
         float: left
 
   &.hasInner > .main .inner-marker
@@ -438,13 +459,41 @@
     font-size: 1.3em
 
 .varyingView
-  .varyingView-reactions li
-    padding: 0.6em 0
+  .varyingView-clearActive
+    position: absolute
+    right: 1em
+    top: 1em
+    z-index: 2
 
-    &:nth-child(2n)
-      background: #ddd
+    .icon
+      color: #777
+      &:before
+        content: $icon-close
+        font-size: 1.3em
+      &:hover
+        color: #333
+
+  .varyingView-reactions
+    .janus-list-selectItem
+      border-left: 0.3em solid transparent
       margin: 0 -1em
       padding: 0.6em 1em
+      position: relative
+
+      button
+        @include fill
+        display: block
+        opacity: 0
+        width: 100% // ??
+
+      &.checked
+        border-left-color: $color-active
+        background: #fff
+
+    li:nth-child(2n) .janus-list-selectItem
+      background: #ddd
+      &.checked
+        background: #fff
 
 .janus-null
   opacity: 0.5
