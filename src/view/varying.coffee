@@ -1,5 +1,6 @@
-{ Model, attribute, Varying, DomView, template, find, from } = require('janus')
+{ Model, attribute, Varying, DomView, template, from } = require('janus')
 { WrappedVarying } = require('../model/wrapped-varying')
+find = require('./mutators')
 
 $ = require('jquery')
 
@@ -79,7 +80,8 @@ class VaryingTreeView extends DomView
 
     find('.valueContainer').render(from((x) -> x)).context('delta') # TODO: ehhh on this context name?
 
-    find('.mapping').attr('title', from('target').map((varying) -> varying._f))
+    #find('.mapping').attr('title', from('target').map((varying) -> varying._f))
+    find('.mapping').flyout(from((x) -> x)).context('delta')
 
     find('.varyingTreeView-inner').render(from('inner').map((v) -> WrappedVarying.hijack(v) if v?)).context('tree')
     find('.varyingTreeView-next').render(from('parent').map((v) -> WrappedVarying.hijack(v) if v?)).context('tree')

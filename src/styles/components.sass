@@ -1,3 +1,6 @@
+
+// TODO: break this abomination apart; standardize.
+
 @import 'common'
 @import 'util'
 
@@ -477,7 +480,7 @@
       font-weight: bold
 
     .multiple
-      bottom: 0.4em
+      bottom: 0.5em
       color: $color-ultrafade
       font-size: 0.9em
       position: relative
@@ -548,4 +551,42 @@
 
 .janus-debug-static
   font-family: menlo, consolas
+
+.flyout
+  $marker-size: 0.6em
+  $distance-to-target: 0.4em
+  $vertical-offset: 0.5em
+
+  background-color: #fff
+  border-radius: 0.2em
+  box-shadow: 0 0 0.3em rgba(0, 0, 0, 0.7), 0 0 1em rgba(0, 0, 0, 0.2)
+  margin-left: $marker-size + $distance-to-target
+  margin-top: -1 * $vertical-offset
+  padding: 1em
+  position: absolute
+  z-index: 999
+
+  .flyout-marker
+    $shadow-size: 0.3em
+    height: 2 * ($shadow-size + $marker-size)
+    margin-left: -1 * $shadow-size
+    margin-top: $vertical-offset - $shadow-size
+    overflow: hidden
+    position: absolute
+    width: $marker-size + $shadow-size
+
+    &:before, &:after
+      @include reify
+      left: $shadow-size
+      position: absolute
+      top: $shadow-size
+
+    &.side-left
+      left: -1 * $marker-size
+
+      &:before
+        @include triangle('left', #000, $marker-size)
+        filter: blur($shadow-size)
+      &:after
+        @include triangle('left', #fff, $marker-size)
 

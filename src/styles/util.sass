@@ -31,3 +31,25 @@
   text-align: left
   -webkit-appearance: none
 
+@mixin triangle($direction, $color, $size)
+  $bordered: none
+  $borderless: none
+  @if $direction == 'up'
+    $bordered: 'bottom'
+    $borderless: 'top'
+  @if $direction == 'right'
+    $bordered: 'left'
+    $borderless: 'right'
+  @if $direction == 'down'
+    $bordered: 'top'
+    $borderless: 'bottom'
+  @if $direction == 'left'
+    $bordered: 'right'
+    $borderless: 'left'
+
+  border: $size solid transparent
+  border-#{$borderless}-width: 0
+  border-#{$bordered}-color: $color
+  height: 0
+  width: 0
+
