@@ -161,6 +161,9 @@ class Reaction extends Model
 
   constructor: (root, caller) -> super({ root, caller })
 
+  @attribute('changes', class extends attribute.CollectionAttribute
+    default: -> new List()
+  )
   @attribute('active', class extends attribute.BooleanAttribute
     default: -> true
   )
@@ -170,6 +173,7 @@ class Reaction extends Model
     this.set('root', this.addNode(this.get('root')))
 
   getNode: (wrapped) -> this.get("tree.#{wrapped.get('id')}") if wrapped?
+  watchNode: (wrapped) -> wrapped?.watch('id').flatMap((id) => this.watch("tree.#{id}"))
 
   addNode: (wrapped) ->
     if (snapshot = this.getNode(wrapped))?
@@ -197,6 +201,8 @@ class Reaction extends Model
     value = new Varying(value._value) if value?.isVarying is true
     snapshot.set({ new_value: value, changed: true })
     snapshot.unset('immediate')
+
+    this.get('changes').add(snapshot)
 
 
 module.exports = { WrappedVarying, SnapshottedVarying, Reaction }

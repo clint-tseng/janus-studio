@@ -13,6 +13,23 @@ class VaryingDebugView extends DomView
     find('.janus-varying-contents').render(from((x) -> x)).context('debug')
   )
 
+class VaryingDeltaView extends DomView
+  @_dom: -> $('
+    <div class="varyingDelta">
+      <div class="value"/>
+      <div class="delta">
+        <div class="separator"/>
+        <div class="newValue"/>
+      </div>
+    </div>
+  ')
+  @_template: template(
+    find('.value').render(from('immediate').and('value').all.map((i, v) -> v ? i)).context('debug')
+    find('.newValue').render(from('new_value')).context(from('changed').map((changed) -> 'debug' if changed is true))
+
+    find('.varyingDelta').classed('hasDelta', from('changed'))
+  )
+
 class VaryingTreeView extends DomView
   @_dom: -> $('
     <div class="varyingTreeView">
@@ -31,11 +48,7 @@ class VaryingTreeView extends DomView
               <li class="tagOutdated">Outdated</li>
               <li class="tagImmediate">Immediate</li>
             </ul>
-            <div class="value"/>
-            <div class="delta">
-              <div class="separator"/>
-              <div class="newValue"/>
-            </div>
+            <div class="valueContainer"/>
           </div>
         </div>
       </div>
@@ -64,8 +77,7 @@ class VaryingTreeView extends DomView
     find('.title .className').text(from('title'))
     find('.title .uid').text(from('id').map((x) -> "##{x}"))
 
-    find('.value').render(from('immediate').and('value').all.map((i, v) -> v ? i)).context('debug')
-    find('.newValue').render(from('new_value')).context(from('changed').map((changed) -> 'debug' if changed is true))
+    find('.valueContainer').render(from((x) -> x)).context('delta') # TODO: ehhh on this context name?
 
     find('.mapping').attr('title', from('target').map((varying) -> varying._f))
 
@@ -73,8 +85,6 @@ class VaryingTreeView extends DomView
     find('.varyingTreeView-next').render(from('parent').map((v) -> WrappedVarying.hijack(v) if v?)).context('tree')
     find('.varyingTreeView-nexts').render(from('parents').map((x) -> x?.map((v) -> WrappedVarying.hijack(v))))
       .context('linked').options( itemContext: 'tree' )
-
-    find('.valueSection').classed('hasDelta', from('changed'))
   )
 
 
@@ -135,6 +145,7 @@ class VaryingView extends DomView
 
     find('.varyingView-reactions').render(from.attribute('active_reaction'))
       .context('edit').find( attributes: { style: 'list' } )
+      .options(from('wrapped').map((wv) -> { renderItem: (x) -> x.options( settings: { target: wv } ) }))
 
     find('.panel-subtitle').classed('hide', from('active_reaction').map((ar) -> !ar?))
     find('.panel-subtitleText').text(from('active_reaction').watch('root').watch('id').map((id) -> "Reaction @##{id}"))
@@ -150,6 +161,7 @@ module.exports = {
 
   registerWith: (library) ->
     library.register(Varying, VaryingDebugView, context: 'debug')
+    library.register(WrappedVarying, VaryingDeltaView, context: 'delta')
     library.register(WrappedVarying, VaryingTreeView, context: 'tree')
     library.register(Varying, VaryingView, context: 'debug-pane')
 }

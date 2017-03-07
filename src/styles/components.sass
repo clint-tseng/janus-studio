@@ -290,50 +290,20 @@
     .title
       font-weight: bold
 
-    .valueSection
-      overflow: hidden
+  .tags
+    float: left
 
-      &.hasDelta
-        > div
-          background-color: $color-highlight-bg
-        .delta
-          display: block
-
-      .tags
-        float: left
-
-        li
-          background: #999
-          border-radius: 0.3em
-          color: #fff
-          float: left
-          font-size: 0.8em
-          letter-spacing: -0.05em
-          margin: 0.1em
-            right: 0.5em
-          padding: 0.2em 0.4em
-          text-transform: uppercase
-
-      .value
-        float: left
-        font-size: 1.2em
-        padding-top: 0.1em
-
-      .delta
-        display: none
-        float: left
-        font-size: 1.2em
-        padding-top: 0.1em
-
-      .separator
-        @include icon
-        float: left
-        padding: 0 0.2em
-        &:before
-          content: $icon-arrow-right
-
-      .newValue
-        float: left
+    li
+      background: #999
+      border-radius: 0.3em
+      color: #fff
+      float: left
+      font-size: 0.8em
+      letter-spacing: -0.05em
+      margin: 0.1em
+        right: 0.5em
+      padding: 0.2em 0.4em
+      text-transform: uppercase
 
   &.hasInner > .main .inner-marker
     display: block
@@ -482,24 +452,65 @@
     top: ($node-size - $inner-size) / -2
 
 .reaction
-  .upper, .lower
-    overflow: hidden
-  .upper
-    margin-bottom: 0.4em
-
-  .uid, .root
-    float: left
-  .time
-    float: right
-
-  .uid
-    font-weight: bold
   .time
     font-size: 0.9em
-    opacity: 0.7
+    padding-bottom: 0.5em
 
-  .root
-    font-size: 1.3em
+    .minor
+      color: $color-fade
+      opacity: 0.7
+
+  .reaction-part
+    overflow: hidden
+    .reaction-part-id
+      float: left
+      font-size: 1.2em
+      font-weight: bold
+    .reaction-part-delta
+      float: right
+
+  .reaction-intermediate
+    padding-bottom: 0.35em
+
+    .ellipsis
+      font-size: 2.4em
+      font-weight: bold
+
+    .multiple
+      bottom: 0.4em
+      color: $color-ultrafade
+      font-size: 0.9em
+      position: relative
+
+.varyingDelta
+  overflow: hidden
+
+  &.hasDelta
+    > div
+      background-color: $color-highlight-bg
+    .delta
+      display: block
+
+  .value
+    float: left
+    font-size: 1.2em
+    padding-top: 0.1em
+
+  .delta
+    display: none
+    float: left
+    font-size: 1.2em
+    padding-top: 0.1em
+
+  .separator
+    @include icon
+    float: left
+    padding: 0 0.2em
+    &:before
+      content: $icon-arrow-right
+
+  .newValue
+    float: left
 
 .varyingView
   .varyingView-reactions
