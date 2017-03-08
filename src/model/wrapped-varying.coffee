@@ -75,13 +75,17 @@ class WrappedVarying extends Model
         if (extantRxn = self.get('active_reactions').at(0))?
           extantRxn.logChange(self, value)
         else if (extantRxn = self.unset('parent_reaction'))?
-          extantRxn.addNode(self)
-          extantRxn.get('latest').set('new_inner', self)
+          snapshot = extantRxn.addNode(self)
+          latest = extantRxn.get('latest')
+          latest.set('new_inner', snapshot) unless latest.get('inner') is snapshot
           extantRxn.logChange(self, value)
         else
           # nothing has been set, but by virtue of a new observation we are now
           # computing what was previously not. create a reaction.
           # TODO: is this always true, or are there other causes for this branch?
+          # * for instance, it's debatable whether a silent=true call borne out
+          #   of a .react() is worth a Reaction, as the internal code really just
+          #   calls onValue out of convenience.
           newRxn = self._startReaction(value, arguments.callee.caller)
 
         if varying._flatten is true
