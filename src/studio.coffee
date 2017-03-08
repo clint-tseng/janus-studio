@@ -26,7 +26,7 @@ app = new App({ views, stores, global })
 
 $ -> defer ->
   { Model } = require('janus')
-  window.obj = new Model( test: 1, test2: 'hello', test3: { test4: 42 } )
+  window.obj = new Model( test: 7, test2: 'hello', test3: { test4: 42 } )
   debugView = app.getView(window.obj, context: 'debug-pane')
   $('#janus').append(debugView.artifact())
   debugView.wireEvents()
@@ -37,7 +37,7 @@ $ -> defer ->
   v.a = new Varying(2)
   v.b = new Varying(3)
   v.c = Varying.mapAll(v.m, v.a, v.b, (m, a, b) -> m + a + b)
-  v.x = new Varying(7)
+  v.x = window.obj.watch('test')
   v.y = v.x.flatMap((x) -> v.c.map((c) -> c * x)).map((y) -> y + 9)
   debugVaryingView = app.getView(v.y, context: 'debug-pane')
   $('#janus').append(debugVaryingView.artifact())
