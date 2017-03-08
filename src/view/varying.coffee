@@ -54,7 +54,8 @@ class VaryingTreeView extends DomView
         </div>
       </div>
       <div class="aux">
-        <div class="varyingTreeView-inner"/>
+        <div class="varyingTreeView-inner varyingTreeView-innerNew"/>
+        <div class="varyingTreeView-inner varyingTreeView-innerMain"/>
         <div class="mapping"><span>λ</span></div>
       </div>
       <div class="varyingTreeView-next"/>
@@ -82,7 +83,9 @@ class VaryingTreeView extends DomView
 
     find('.mapping').flyout(from((x) -> x).and('mapped').all.map((wv, mapped) -> wv if mapped is true)).context('mapping')
 
-    find('.varyingTreeView-inner').render(from('inner').map((v) -> WrappedVarying.hijack(v) if v?)).context('tree')
+    find('.varyingTreeView-innerNew').classed('hasNewInner', from('new_inner').map((x) -> x?))
+    find('.varyingTreeView-innerNew').render(from('new_inner').map((v) -> WrappedVarying.hijack(v) if v?)).context('tree')
+    find('.varyingTreeView-innerMain').render(from('inner').map((v) -> WrappedVarying.hijack(v) if v?)).context('tree')
     find('.varyingTreeView-next').render(from('parent').map((v) -> WrappedVarying.hijack(v) if v?)).context('tree')
     find('.varyingTreeView-nexts').render(from('parents').map((x) -> x?.map((v) -> WrappedVarying.hijack(v))))
       .context('linked').options( itemContext: 'tree' )

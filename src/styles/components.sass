@@ -318,6 +318,8 @@
     border-style: dotted
 
   .aux
+    $inner-padding: 3.5em
+
     display: none
     padding-top: 0.2em
     position: relative
@@ -332,9 +334,31 @@
       width: 0
       z-index: 2
 
+    .varyingTreeView-innerNew > .varyingTreeView > .main .title span
+      background: $color-highlight-bg
+
+    .varyingTreeView-innerNew.hasNewInner + .varyingTreeView-inner
+      > .varyingTreeView
+        opacity: 0.35
+        > .main .title span
+          background: $color-highlight-bg
+
+      &:before
+        $icon-size: 1.3em
+        $offset: -0.3em
+
+        @include reify
+        @include icon
+        color: $color-bad
+        content: $icon-delete
+        font-size: $icon-size
+        left: $inner-padding / $icon-size + $offset
+        position: absolute
+        top: $offset
+
     .varyingTreeView-inner
       margin-top: 0.3em
-      padding-left: 3.5em
+      padding-left: $inner-padding
       position: relative
       z-index: 1
 
@@ -343,6 +367,7 @@
       border-radius: $lambda-size
       clear: both
       color: #fff
+      cursor: default
       display: none
       font-weight: bold
       height: $lambda-size
