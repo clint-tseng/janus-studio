@@ -76,7 +76,7 @@ class MappingView extends DomView
       if (parents = wrapped.get('parents'))?
         exec(wrapped.get('target')._f, (valueOf(v) for v in parents.list))
       else if (parent = wrapped.get('parent'))?
-        exec(wrapped.get('target')._f, [ parent ])
+        exec(wrapped.get('target')._f, [ valueOf(parent) ])
     )
 
 
