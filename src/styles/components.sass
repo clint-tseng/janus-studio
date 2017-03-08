@@ -536,6 +536,9 @@
       .reaction
         pointer-events: none
 
+        .varyingDelta.hasDelta > div
+          background-color: transparent
+
     li:nth-child(2n) .janus-list-selectItem
       background: #ddd
       &.checked
@@ -589,4 +592,66 @@
         filter: blur($shadow-size)
       &:after
         @include triangle('left', #fff, $marker-size)
+
+.mapping
+  .mapping-toolbar
+    overflow: hidden
+    position: absolute
+    right: 1em
+
+  .mapping-debug
+    @include icon
+    float: right
+    font-size: 1.3em
+
+    &:hover
+      color: $color-fade
+
+    &:before
+      content: $icon-bug
+
+  .mapping-arguments
+    padding-bottom: 0.5em
+    ul
+      overflow: hidden
+
+      @each $color in $color-categories
+        li:nth-child(#{index($color-categories, $color)})
+          color: $color
+
+    &.inline
+      ul li
+        float: left
+        padding-right: 0.5em
+
+        .argument:after
+          color: $color-ultrafade
+          content: ','
+
+        &:last-child .argument:after
+          content: none
+
+  .mapping-function pre
+    font-family: $font-mono
+    line-height: 1.1em
+
+  .mapping-result
+    padding-top: 0.5em
+
+    .arrow
+      @include icon
+      float: left
+      padding-right: 0.3em
+
+      &:before
+        content: $icon-arrow-right
+
+  .flyout &
+    min-width: 20em
+
+.argument
+  font-family: $font-mono
+
+  .argument-equals
+    color: $color-ultrafade
 

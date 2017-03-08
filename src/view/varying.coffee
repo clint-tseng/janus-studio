@@ -80,8 +80,7 @@ class VaryingTreeView extends DomView
 
     find('.valueContainer').render(from((x) -> x)).context('delta') # TODO: ehhh on this context name?
 
-    #find('.mapping').attr('title', from('target').map((varying) -> varying._f))
-    find('.mapping').flyout(from((x) -> x)).context('delta')
+    find('.mapping').flyout(from((x) -> x).and('mapped').all.map((wv, mapped) -> wv if mapped is true)).context('mapping')
 
     find('.varyingTreeView-inner').render(from('inner').map((v) -> WrappedVarying.hijack(v) if v?)).context('tree')
     find('.varyingTreeView-next').render(from('parent').map((v) -> WrappedVarying.hijack(v) if v?)).context('tree')
@@ -158,8 +157,10 @@ class VaryingView extends DomView
 
 
 module.exports = {
-  VaryingView
+  VaryingDebugView
+  VaryingDeltaView
   VaryingTreeView
+  VaryingView
 
   registerWith: (library) ->
     library.register(Varying, VaryingDebugView, context: 'debug')
