@@ -39,7 +39,7 @@ class KVPairView extends DomView
     dom = this.artifact()
     edit = dom.find('.kvPair-edit input')
 
-    dom.find('.kvPair-value').on('dblclick', -> edit.focus())
+    dom.find('.kvPair-value').on('dblclick', -> edit.focus().select())
 
 class ModelViewModel extends Model
   @attribute 'alignMode', class extends attribute.EnumAttribute
