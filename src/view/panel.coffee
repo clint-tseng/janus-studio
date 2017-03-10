@@ -26,10 +26,24 @@ class PanelView extends DomView
     find('.panel-wrapper').css('width', layoutAttr('width'))
     find('.panel-wrapper').css('height', layoutAttr('height'))
 
-    find('.panel-contents').render(from('fixture').watch('id').and('context').all.flatMap((id, context) ->
-      context.watch("locals.#{id}")
-    )).context('panel')
+    find('.panel-wrapper').classed('minimized', from('minimized'))
+
+    find('.panel-minimize').classed('disabled', from('minimized'))
+    find('.panel-maximize').classed('disabled', from('maximized'))
+    find('.panel-close').classed('disabled', from('has_dependencies'))
+
+    find('.panel-contents')
+      .render(from('id').and('context').all.flatMap((id, context) -> context.watch("locals.#{id}")))
+      .context('panel')
   )
+
+  _wireEvents: ->
+    dom = this.artifact()
+    panel = this.subject
+
+    dom.find('.panel-minimize').on('click', -> panel.smaller())
+    dom.find('.panel-maximize').on('click', -> panel.bigger())
+    dom.find('.panel-close').on('click', -> panel.get('fixture').destroy())
 
 module.exports = {
   PanelView

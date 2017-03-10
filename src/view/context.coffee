@@ -11,6 +11,8 @@ class ContextView extends DomView
   ')
   @_template: template(
     find('.context-area').render(from('panels'))
+    find('.context-area').classed('hasMinimized',
+      from('layout').watch('minimized').flatMap((xs) -> xs.watchLength().map((l) -> l > 0)))
   )
 
 module.exports = {
