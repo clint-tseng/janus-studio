@@ -4,8 +4,61 @@
 @import 'common'
 @import 'util'
 
+@mixin panel-toolpane
+  background: transparent
+  border-radius: 0.2em
+  float: right
+  overflow: hidden
+
+  li
+    float: left
+    font-size: 1.33333em
+    height: 1em
+    padding: 0.4em
+      bottom: 0.2em
+    position: relative
+    width: 1em
+
+  &:hover
+    background: $color-panel-toolpane-bg
+
 .panel-wrapper
   position: absolute
+
+  .panel-wrapperToolbar
+    @include panel-toolpane
+    float: none
+    overflow: hidden
+    padding: 0.2em 0.3em 0
+    position: absolute
+    right: 1em
+    top: 1em
+    z-index: 1
+
+    a
+      @include icon
+      color: $color-ultrafade
+      cursor: default
+      float: left
+      padding: 0.4em
+        right: 0.6em
+
+      &:last-child
+        padding-right: 0.4em
+
+      &:hover
+        color: $color-normal
+
+      &:before
+        @include reify
+
+      &.panel-minimize:before
+        content: $icon-minimize
+      &.panel-maximize:before
+        content: $icon-maximize
+      &.panel-close:before
+        content: $icon-close
+        font-size: 1.1em // have i ever mentioned that i don't like FA?
 
 .panel
   $sidebar-width: 16em
@@ -16,11 +69,11 @@
   border-left: 2px solid #777
 
   .panel-toolbar
-    @include fill
     bottom: auto
     overflow: hidden
     padding: 0.5em
     position: absolute
+    right: 7em
     top: 0
     z-index: 1
 
@@ -71,7 +124,7 @@
         .icon
           color: #ddd
           &:before
-            content: $icon-close
+            content: $icon-circle-close
             font-size: 1.3em
           &:hover
             color: #fff
@@ -138,24 +191,6 @@
         opacity: 1
         pointer-events: auto
 
-@mixin panel-toolpane
-  background: transparent
-  border-radius: 0.2em
-  float: right
-  overflow: hidden
-
-  li
-    float: left
-    font-size: 1.33333em
-    height: 1em
-    padding: 0.4em
-      bottom: 0.2em
-    position: relative
-    width: 1em
-
-  &:hover
-    background: $color-panel-toolpane-bg
-
 .toggleButtons
   @include panel-toolpane
 
@@ -166,30 +201,30 @@
       z-index: 1
 
     .icon
-      opacity: 0.05
+      color: $color-barelythere
     .checked .icon
-      opacity: 0.4
+      color: $color-ultrafade
 
   &:hover li
     .icon
-      opacity: 0.3
+      color: $color-ultrafade
     &:hover .icon
-      opacity: 0.7
+      color: $color-normal
     .checked .icon
-      opacity: 1
+      color: $color-active
 
 .toggleSwitch
   @include panel-toolpane
 
   .icon-plug
-    opacity: 0.4
+    color: $color-ultrafade
 
   .switch
     padding: 0.3em 0.6em 0 0.1em
 
     button
       @include bare-button
-      opacity: 0.2
+      color: $color-ultrafade
 
       &:before
         @include reify
@@ -198,17 +233,14 @@
         font-size: 1.3em
 
   &:hover
-    .icon-plug
-      opacity: 0.7
-    .switch button
-      opacity: 0.7
+    .icon-plug, .switch button
+      color: $color-normal
 
   &.checked
     .icon-plug
       color: $color-active
-      opacity: 1
     .switch button
-      opacity: 1
+      color: $color-normal
       &:before
         content: $icon-toggle-on
 
