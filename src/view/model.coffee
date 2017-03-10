@@ -75,6 +75,6 @@ module.exports = {
 
   registerWith: (library) ->
     library.register(KVPair, KVPairView)
-    library.register(Model, ModelView, context: 'debug-pane')
+    library.register(Model, ModelView, context: 'panel')
 }
 

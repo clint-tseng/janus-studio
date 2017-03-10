@@ -18,28 +18,29 @@ require('./view/varying').registerWith(views)
 require('./view/mapping').registerWith(views)
 require('./view/reaction').registerWith(views)
 require('./view/list').registerWith(views)
+require('./view/context').registerWith(views)
+require('./view/panel').registerWith(views)
 stores = new Library()
 
 { Global } = require('./model/global')
 global = new Global()
+
 app = new App({ views, stores, global })
 
 $ -> defer ->
-  { Model } = require('janus')
-  window.obj = new Model( test: 7, test2: 'hello', test3: { test4: 42 } )
-  debugView = app.getView(window.obj, context: 'debug-pane')
-  $('#janus').append(debugView.artifact())
-  debugView.wireEvents()
+  { List } = require('janus')
 
-  { Varying } = require('janus')
-  window.v = v = {}
-  v.m = new Varying(1)
-  v.a = new Varying(2)
-  v.b = new Varying(3)
-  v.c = Varying.mapAll(v.m, v.a, v.b, (m, a, b) -> m + a + b)
-  v.x = window.obj.watch('test')
-  v.y = v.x.flatMap((x) -> v.c.map((c) -> c * x)).map((y) -> y + 9)
-  debugVaryingView = app.getView(v.y, context: 'debug-pane')
-  $('#janus').append(debugVaryingView.artifact())
-  debugVaryingView.wireEvents()
+  { Context } = require('./model/context')
+  { Fixture, Fixtures } = require('./model/fixture')
+  context = window.context = new Context(
+    fixtures: new Fixtures([
+      new Fixture( id: 1, code: 'new Model( test: 7, test1: 2, test2: "hello", test3: { test4: 42 } )' ),
+      new Fixture( id: 2, parameters: new List(1), code: "$1.watch('test').flatMap((x) -> Varying.mapAll(new Varying(1), $1.watch('test1'), new Varying(3), (a, b, c) -> a + b + c).map((c) -> c * x)).map((y) -> y + 9)" )
+    ]),
+    _uniqueId: 2
+  )
+
+  contextView = app.getView(context)
+  $('#janus').append(contextView.artifact())
+  contextView.wireEvents()
 

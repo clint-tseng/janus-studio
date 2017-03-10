@@ -4,17 +4,16 @@
 @import 'common'
 @import 'util'
 
+.panel-wrapper
+  position: absolute
+
 .panel
   $sidebar-width: 16em
 
+  @include fill(0.5em)
   background-color: $color-panel-bg
   border-radius: 0.2em
   border-left: 2px solid #777
-  position: relative
-
-  //temp:
-  margin: 3em
-  width: 45em
 
   .panel-toolbar
     @include fill

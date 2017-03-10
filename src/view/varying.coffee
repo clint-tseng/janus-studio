@@ -169,6 +169,6 @@ module.exports = {
     library.register(Varying, VaryingDebugView, context: 'debug')
     library.register(WrappedVarying, VaryingDeltaView, context: 'delta')
     library.register(WrappedVarying, VaryingTreeView, context: 'tree')
-    library.register(Varying, VaryingView, context: 'debug-pane')
+    library.register(Varying, VaryingView, context: 'panel')
 }
 
