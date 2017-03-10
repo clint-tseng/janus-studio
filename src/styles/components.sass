@@ -61,6 +61,8 @@
 
       &:hover
         color: $color-normal
+        &.disabled
+          color: $color-ultrafade
 
       &:before
         @include reify
@@ -773,6 +775,7 @@
       font-family: $font-mono
       font-size: 2em
       font-weight: bold
+      overflow: hidden
       padding: 0.5em
         left: 0.7em
 
@@ -780,6 +783,34 @@
         @include reify
         @include icon
         content: $icon-angle-right
+        float: left
+
+      .prompt-locals
+        float: left
+        font-size: 0.8em
+        padding: 0.1em 0.4em
+          right: 0
+
+        > span
+          float: left
+
+      .prompt-localsList
+        float: left
+
+        li
+          float: left
+          padding-right: 0.3em
+
+          span:before
+            content: '$'
+          span:after
+            content: ', '
+
+          &:last-child
+            padding-right: 0
+
+            span:after
+              display: none
 
     .prompt-textContainer
       min-height: $prompt-height

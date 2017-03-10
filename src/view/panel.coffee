@@ -48,6 +48,10 @@ class PanelView extends DomView
     dom.find('.panel-maximize').on('click', -> panel.bigger())
     dom.find('.panel-close').on('click', -> panel.get('fixture').destroy() unless $(this).hasClass('disabled'))
 
+    dom.find('.panel-var').on('click', ->
+      panel.get('context').get('prompt').get('parameters').add(panel.get('id'))
+    )
+
 module.exports = {
   PanelView
 

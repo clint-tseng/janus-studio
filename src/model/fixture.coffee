@@ -1,4 +1,4 @@
-{ Model, attribute, List, Varying } = require('janus')
+{ Model, attribute, List, Set, Varying } = require('janus')
 
 # for testing purposes, initially all fixtures are arbitrary code.
 class Fixture extends Model
@@ -7,7 +7,9 @@ class Fixture extends Model
     default: -> new List()
   )
 
-class Fixtures extends List
+  @attribute('code', class extends attribute.TextAttribute)
+
+class Fixtures extends Set
   @modelClass: Fixture
 
 

@@ -1,7 +1,7 @@
 { Model, attribute, from, Varying, List } = require('janus')
 { compile } = require('livescript')
 
-{ Fixtures } = require('./fixture')
+{ Fixture, Fixtures } = require('./fixture')
 { Layout } = require('./layout')
 { Panel } = require('../viewmodel/panel')
 
@@ -73,10 +73,16 @@ class Context extends Model
     default: -> new Layout()
   )
 
+  commitPrompt: ->
+    fixture = this.get('prompt')
+    this.set('prompt', new Fixture( id: this._uniqueId() ))
+    this.get('fixtures').add(fixture)
+
   _initialize: ->
     this.watch('layout').reactNow((layout) => layout.set('context', this))
+    this.set('prompt', new Fixture( id: this._uniqueId() ))
 
-  _uniqueId: -> this.set('_uniqueId', this.get('_uniqueId' + 1))
+  _uniqueId: -> this.set('_uniqueId', this.get('_uniqueId') + 1)
 
 
 module.exports = { Context }
