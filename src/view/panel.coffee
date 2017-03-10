@@ -6,7 +6,10 @@ $ = require('jquery')
 class PanelView extends DomView
   @_dom: -> $('
     <div class="panel-wrapper">
-      <div class="panel-wrapperToolbar">
+      <div class="panel-wrapperToolbar panel-wrapperSubjectControls">
+        <a class="panel-var"/>
+      </div>
+      <div class="panel-wrapperToolbar panel-wrapperWindowControls">
         <a class="panel-minimize"/>
         <a class="panel-maximize"/>
         <a class="panel-close"/>
@@ -43,7 +46,7 @@ class PanelView extends DomView
 
     dom.find('.panel-minimize').on('click', -> panel.smaller())
     dom.find('.panel-maximize').on('click', -> panel.bigger())
-    dom.find('.panel-close').on('click', -> panel.get('fixture').destroy())
+    dom.find('.panel-close').on('click', -> panel.get('fixture').destroy() unless $(this).hasClass('disabled'))
 
 module.exports = {
   PanelView

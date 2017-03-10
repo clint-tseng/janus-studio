@@ -7,6 +7,12 @@ class ContextView extends DomView
   @_dom: -> $('
     <div class="context">
       <div class="context-area"/>
+      <div class="prompt">
+        <div class="prompt-prefix"></div>
+        <div class="prompt-textContainer">
+          <textarea></textarea>
+        </div>
+      </div>
     </div>
   ')
   @_template: template(

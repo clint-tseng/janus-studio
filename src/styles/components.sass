@@ -45,7 +45,6 @@
     overflow: hidden
     padding: 0.2em 0.3em 0
     position: absolute
-    right: 1em
     top: 1em
     z-index: 1
 
@@ -77,6 +76,15 @@
       &.panel-close:before
         content: $icon-close
         font-size: 1.1em // have i ever mentioned that i don't like FA?
+      &.panel-var:before
+        bottom: 0.1em // aaaaand again.
+        content: $icon-buck
+        position: relative
+
+    &.panel-wrapperWindowControls
+      right: 1em
+    &.panel-wrapperSubjectControls
+      right: 7em
 
 .panel
   $sidebar-width: 16em
@@ -91,7 +99,7 @@
     overflow: hidden
     padding: 0.5em
     position: absolute
-    right: 7em
+    right: 9em
     top: 0
     z-index: 1
 
@@ -737,9 +745,52 @@
   .argument-equals
     color: $color-ultrafade
 
-.context .context-area
-  @include fill
+.context
+  $prompt-height: 4em // TODO: expands
 
-  &.hasMinimized
-    bottom: 4em
+  .context-area
+    $padding: 1em
+
+    bottom: $prompt-height + $padding
+    left: $padding
+    position: absolute
+    right: $padding
+    top: 3.5em
+
+    &.hasMinimized
+      bottom: 4.5em + $prompt-height
+
+  .prompt
+    @include fill
+    background: #fff
+    border-top: 1px solid #eee
+    height: $prompt-height
+    top: auto
+
+    .prompt-prefix
+      color: $color-fade
+      float: left
+      font-family: $font-mono
+      font-size: 2em
+      font-weight: bold
+      padding: 0.5em
+        left: 0.7em
+
+      &:before
+        @include reify
+        @include icon
+        content: $icon-angle-right
+
+    .prompt-textContainer
+      min-height: $prompt-height
+      overflow: hidden
+      position: relative
+
+      textarea
+        @include fill
+        @include bare-textbox
+        font-family: $font-mono
+        font-size: 1.6em
+        line-height: 2.5em
+        width: 100%
 

@@ -41,6 +41,6 @@ $ -> defer ->
   )
 
   contextView = app.getView(context)
-  $('#janus').append(contextView.artifact())
+  $('#main').append(contextView.artifact())
   contextView.wireEvents()
 

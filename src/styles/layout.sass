@@ -14,7 +14,6 @@
     line-height: 3em
 
 $sidebar-width: 20em // TODO: draggable
-$prompt-height: 4em // TODO: expands
 
 #sidebar
   $padding: 1.5em
@@ -31,46 +30,6 @@ $prompt-height: 4em // TODO: expands
     font-size: 1.2em
 
 #main
-  $padding: 1em
-
-  bottom: $prompt-height + $padding
-  left: $sidebar-width + $padding
-  position: absolute
-  right: $padding
-  top: 3.5em
-
-#prompt
   @include fill
-  background: #fff
-  border-top: 1px solid #eee
   left: $sidebar-width
-  height: $prompt-height
-  top: auto
-
-  .prompt-prefix
-    color: $color-fade
-    float: left
-    font-family: $font-mono
-    font-size: 2em
-    font-weight: bold
-    padding: 0.5em
-      left: 0.7em
-
-    &:before
-      @include reify
-      @include icon
-      content: $icon-angle-right
-
-  .prompt-textContainer
-    min-height: $prompt-height
-    overflow: hidden
-    position: relative
-
-    textarea
-      @include fill
-      @include bare-textbox
-      font-family: $font-mono
-      font-size: 1.6em
-      line-height: 2.5em
-      width: 100%
 
