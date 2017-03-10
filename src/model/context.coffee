@@ -18,9 +18,9 @@ class FixtureBinding extends Model
       id = this.get('fixture').get('id')
 
       if result instanceof Error
+        console.error(result)
         context.unset("locals.#{id}")
       else
-        console.log(result)
         context.set("locals.#{id}", result)
 
       result
