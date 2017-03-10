@@ -44,7 +44,7 @@ class Layout extends Model
         nonexpandHeight = 300
         for panel in panels.list when panel.get('id') not in maximized.list and panel.get('id') not in minimized.list
           result[panel.get('id')] = {
-            left: pct(65), top: pct(nonexpandHeight * idx),
+            left: pct(65), top: px(nonexpandHeight * idx),
             width: pct(35), height: px(nonexpandHeight)
           }
           idx += 1
