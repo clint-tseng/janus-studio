@@ -16,8 +16,8 @@ class PanelView extends DomView
   ')
 
   layoutAttr = (attr) ->
-    from('context').and('fixture').watch('id').all.flatMap((context, id) ->
-      context.watch("layout.computed.#{id}.#{attr}")
+    from('context').watch('layout').and('fixture').watch('id').all.flatMap((layout, id) ->
+      layout.watch("computed.#{id}.#{attr}")
     )
 
   @_template: template(

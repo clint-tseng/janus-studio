@@ -2,7 +2,7 @@
 { compile } = require('livescript')
 
 { Fixtures } = require('./fixture')
-{ Layout } = require('../viewmodel/layout')
+{ Layout } = require('./layout')
 { Panel } = require('../viewmodel/panel')
 
 
@@ -68,10 +68,13 @@ class Context extends Model
     fixtures.map((fixture) -> new Panel(context, fixture)))
   )
 
-  @transient('layout.computed')
-  @bind('layout.computed', from.self().flatMap((context) ->
-    Varying.managed((-> new Layout(context)), ((layout) -> layout.compute()))
-  ))
+  @attribute('layout', class extends attribute.ModelAttribute
+    @modelClass: Layout
+    default: -> new Layout()
+  )
+
+  _initialize: ->
+    this.watch('layout').reactNow((layout) => layout.set('context', this))
 
   _uniqueId: -> this.set('_uniqueId', this.get('_uniqueId' + 1))
 
