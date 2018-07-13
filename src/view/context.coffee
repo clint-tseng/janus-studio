@@ -3,8 +3,7 @@ $ = require('jquery')
 
 { Context } = require('../model/context')
 
-class ContextView extends DomView
-  @_dom: -> $('
+ContextView = DomView.build($('
     <div class="context">
       <div class="context-area"/>
       <div class="prompt">
@@ -20,26 +19,21 @@ class ContextView extends DomView
         </div>
       </div>
     </div>
-  ')
-  @_template: template(
+  '), template(
+
     find('.context-area').render(from('panels'))
     find('.context-area').classed('hasMinimized',
       from('layout').watch('minimized').flatMap((xs) -> xs.watchLength().map((l) -> l > 0)))
 
     find('.prompt-localsList').render(from('prompt').watch('parameters'))
     find('.prompt-locals').classed('hide', from('prompt').watch('parameters').flatMap((ps) -> ps.watchLength().map((l) -> l is 0)))
-    find('.prompt-textContainer').render(from('prompt').map((p) -> p.attribute('code')))
-      .context('edit').find( attributes: { style: 'multiline' } )
+
+    find('.prompt-textContainer')
+      .render(from('prompt').map((p) -> p.attribute('code')))
+        .context('edit').criteria( attributes: { style: 'multiline' } )
+      .on('keydown', 'textarea', (event, context) -> context.commitPrompt() if event.which is 13)
   )
-
-  _wireEvents: ->
-    dom = this.artifact()
-    context = this.subject
-
-    dom.find('.prompt-textContainer').on('keydown', 'textarea', (event) ->
-      if event.which is 13
-        context.commitPrompt()
-    )
+)
 
 module.exports = {
   ContextView

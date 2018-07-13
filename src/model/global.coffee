@@ -1,6 +1,6 @@
-{ Struct } = require('janus')
+{ Map } = require('janus')
 
-class Global extends Struct
+class Global extends Map
   shadow: -> this
 
 module.exports = { Global }

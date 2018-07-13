@@ -40,7 +40,7 @@ $ -> defer ->
     _uniqueId: 2
   )
 
-  contextView = app.getView(context)
+  contextView = app.vendView(context)
   $('#main').append(contextView.artifact())
   contextView.wireEvents()
 

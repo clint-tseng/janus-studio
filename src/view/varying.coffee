@@ -1,21 +1,18 @@
-{ Model, attribute, Varying, DomView, template, from } = require('janus')
+{ Model, attribute, bind, Varying, DomView, template, from } = require('janus')
 { WrappedVarying } = require('../model/wrapped-varying')
 find = require('./mutators')
 
 $ = require('jquery')
 
-class VaryingDebugView extends DomView
-  @_dom: -> $('
+VaryingDebugView = DomView.build($('
     <div class="janus-varying">
       <span class="janus-debug-static">Varying[</span><div class="janus-varying-contents"/><span class="janus-debug-static">]</span>
     </div>
-  ')
-  @_template: template(
-    find('.janus-varying-contents').render(from((x) -> x)).context('debug')
-  )
+  '),
+  find('.janus-varying-contents').render(from((x) -> x)).context('debug')
+)
 
-class VaryingDeltaView extends DomView
-  @_dom: -> $('
+VaryingDeltaView = DomView.build($('
     <div class="varyingDelta">
       <div class="value"/>
       <div class="delta">
@@ -23,16 +20,16 @@ class VaryingDeltaView extends DomView
         <div class="newValue"/>
       </div>
     </div>
-  ')
-  @_template: template(
+  '), template(
+
     find('.value').render(from('immediate').and('value').all.map((i, v) -> v ? i)).context('debug')
     find('.newValue').render(from('new_value')).context(from('changed').map((changed) -> 'debug' if changed is true))
 
     find('.varyingDelta').classed('hasDelta', from('changed'))
   )
+)
 
-class VaryingTreeView extends DomView
-  @_dom: -> $('
+VaryingTreeView = DomView.build($('
     <div class="varyingTreeView">
       <div class="main">
         <div class="node">
@@ -61,15 +58,16 @@ class VaryingTreeView extends DomView
       <div class="varyingTreeView-next"/>
       <div class="varyingTreeView-nexts"/>
     </div>
-  ')
-  @_template: template(
-    find('.varyingTreeView').classed('derived', from('derived'))
-    find('.varyingTreeView').classed('flattened', from('flattened'))
-    find('.varyingTreeView').classed('mapped', from('mapped'))
+  '), template(
 
-    find('.varyingTreeView').classed('hasObservations', from('observations').flatMap((os) -> os.watchLength().map((l) -> l > 0)))
-    find('.varyingTreeView').classed('hasValue', from('value').map((x) -> x?))
-    find('.varyingTreeView').classed('hasInner', from('inner').map((x) -> x?))
+    find('.varyingTreeView')
+      .classed('derived', from('derived'))
+      .classed('flattened', from('flattened'))
+      .classed('mapped', from('mapped'))
+
+      .classed('hasObservations', from('observations').flatMap((os) -> os.watchLength().map((l) -> l > 0)))
+      .classed('hasValue', from('value').map((x) -> x?))
+      .classed('hasInner', from('inner').map((x) -> x?))
 
     find('.tagOutdated').classed('hide', from('derived').and('immediate').and('value')
       .and('observations').flatMap((os) -> os.watchLength())
@@ -83,39 +81,39 @@ class VaryingTreeView extends DomView
 
     find('.mapping').flyout(from((x) -> x).and('mapped').all.map((wv, mapped) -> wv if mapped is true)).context('mapping')
 
-    find('.varyingTreeView-innerNew').classed('hasNewInner', from('new_inner').map((x) -> x?))
-    find('.varyingTreeView-innerNew').render(from('new_inner').map((v) -> WrappedVarying.hijack(v) if v?)).context('tree')
+    find('.varyingTreeView-innerNew')
+      .classed('hasNewInner', from('new_inner').map((x) -> x?))
+      .render(from('new_inner').map((v) -> WrappedVarying.hijack(v) if v?)).context('tree')
     find('.varyingTreeView-innerMain').render(from('inner').map((v) -> WrappedVarying.hijack(v) if v?)).context('tree')
     find('.varyingTreeView-next').render(from('parent').map((v) -> WrappedVarying.hijack(v) if v?)).context('tree')
     find('.varyingTreeView-nexts').render(from('parents').map((x) -> x?.map((v) -> WrappedVarying.hijack(v))))
       .context('linked').options( itemContext: 'tree' )
   )
+)
 
 
-class VaryingPanel extends Model
-  @attribute('subscribed', attribute.BooleanAttribute)
+class VaryingPanel extends Model.build(
+    attribute('subscribed', attribute.Boolean)
 
-  @attribute('active_reaction', class extends attribute.EnumAttribute
-    nullable: true
-    values: -> this.model.watch('wrapped').flatMap((wv) -> wv.watch('reactions'))
-    default: -> null
+    attribute('active_reaction', class extends attribute.Enum
+      nullable: true
+      values: -> this.model.watch('wrapped').flatMap((wv) -> wv.watch('reactions'))
+      default: -> null
+    )
+
+    bind('wrapped', from('subject').map((varying) -> WrappedVarying.hijack(varying)))
   )
-
-  @bind('wrapped', from('subject').map((varying) -> WrappedVarying.hijack(varying)))
 
   _initialize: ->
     # create or destroy our own hollow observation:
-    this.watch('subscribed').react((subbed) =>
+    this.watch('subscribed').reactLater((subbed) =>
       if subbed
-        this._observation = this.get('subject').reactNow(->)
+        this._observation = this.get('subject').react(->)
       else
         this._observation.stop()
     )
 
-class VaryingView extends DomView
-  @viewModelClass: VaryingPanel
-
-  @_dom: -> $('
+VaryingView = DomView.build($('
     <div class="varyingView panel hasSidebar">
       <div class="panel-toolbar">
         <ul class="varyingView-subscriptionToggle toggleSwitch">
@@ -135,28 +133,28 @@ class VaryingView extends DomView
       </div>
       <div class="panel-sidebar varyingView-reactions"></div>
     </div>
-  ')
-  @_template: template(
+  '), template(
+
     find('.varyingView-titleMain').text(from('wrapped').watch('title'))
 
     find('.varyingView-subscriptionToggle').classed('checked', from('subscribed'))
     find('.varyingView-subscriptionToggle .switch').render(from.attribute('subscribed'))
-      .context('edit').find( attributes: { style: 'button' } )
+      .context('edit').criteria( attributes: { style: 'button' } )
 
     find('.varyingView-tree').render(from('wrapped').and('active_reaction').all.flatMap((wv, ar) ->
       if ar? then wv.watch('id').flatMap((id) -> ar.watch("tree.#{id}")) else wv
     )).context('tree')
 
     find('.varyingView-reactions').render(from.attribute('active_reaction'))
-      .context('edit').find( attributes: { style: 'list' } )
+      .context('edit').criteria( attributes: { style: 'list' } )
       .options(from('wrapped').map((wv) -> { renderItem: (x) -> x.options( settings: { target: wv } ) }))
 
     find('.panel-subtitle').classed('hide', from('active_reaction').map((ar) -> !ar?))
     find('.panel-subtitleText').text(from('active_reaction').watch('root').watch('id').map((id) -> "Reaction @##{id}"))
-  )
 
-  _wireEvents: ->
-    this.artifact().find('.panel-subtitleClose').on('click', => this.subject.unset('active_reaction'))
+    find('.panel-subtitleClose').on('click', (_, subject) => subject.unset('active_reaction'))
+  ), { viewModelClass: VaryingPanel }
+)
 
 
 module.exports = {

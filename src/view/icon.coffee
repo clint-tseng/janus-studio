@@ -2,9 +2,9 @@
 
 $ = require('jquery')
 
-class IconView extends DomView
-  @_dom: -> $('<span class="icon"/>')
-  @_template: template(find('span').classGroup('icon-', from.self().map((x) -> x.subject)))
+IconView = DomView.build($('<span class="icon"/>'), template(
+  find('span').classGroup('icon-', from.self().map((x) -> x.subject))
+))
 
 module.exports = {
   IconView,

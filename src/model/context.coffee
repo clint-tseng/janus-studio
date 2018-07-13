@@ -1,4 +1,4 @@
-{ Model, attribute, from, Varying, List } = require('janus')
+{ Model, attribute, bind, transient, from, Varying, List } = require('janus')
 { compile } = require('livescript')
 
 { Fixture, Fixtures } = require('./fixture')
@@ -7,12 +7,13 @@
 
 
 # TODO: someday should be able to have nonlive contexts.
+# TODO: harmonize/combine with the eval runner in janus-docs.
 class FixtureBinding extends Model
   constructor: (context, fixture) -> super({ context, fixture })
 
   _initialize: ->
     this.destroyWith(this.get('context'))
-    this._spawner = this._spawn().reactNow((result) =>
+    this._spawner = this._spawn().react((result) =>
       #TODO: is there a cleverer way to get these values short of returning a tuple?
       context = this.get('context')
       id = this.get('fixture').get('id')
@@ -46,41 +47,42 @@ class FixtureBinding extends Model
     this._spawner.stop()
     super()
 
-class Context extends Model
-  @attribute('fixtures', class extends attribute.CollectionAttribute
-    default: -> new Fixtures()
+class Context extends Model.build(
+    attribute('fixtures', class extends attribute.Collection
+      default: -> new Fixtures()
+    )
+
+    attribute('_uniqueId', class extends attribute.Number
+      default: -> 0
+      writeDefault: true
+    )
+
+    transient('locals')
+    transient('bindings')
+    bind('bindings', from.self().and('fixtures').all.map((context, fixtures) ->
+      # TODO: destroy dead bindings
+      fixtures.map((fixture) -> new FixtureBinding(context, fixture))
+    ))
+
+    transient('panels')
+    bind('panels', from.self().and('fixtures').all.map((context, fixtures) ->
+      fixtures.map((fixture) -> new Panel(context, fixture)))
+    )
+
+    attribute('layout', class extends attribute.Model
+      @modelClass: Layout
+      default: -> new Layout()
+    )
   )
 
-  @attribute('_uniqueId', class extends attribute.NumberAttribute
-    default: -> 0
-    writeDefault: true
-  )
-
-  @transient('locals')
-  @transient('bindings')
-  @bind('bindings', from.self().and('fixtures').all.map((context, fixtures) ->
-    # TODO: destroy dead bindings
-    fixtures.map((fixture) -> new FixtureBinding(context, fixture))
-  ))
-
-  @transient('panels')
-  @bind('panels', from.self().and('fixtures').all.map((context, fixtures) ->
-    fixtures.map((fixture) -> new Panel(context, fixture)))
-  )
-
-  @attribute('layout', class extends attribute.ModelAttribute
-    @modelClass: Layout
-    default: -> new Layout()
-  )
+  _initialize: ->
+    this.watch('layout').react((layout) => layout.set('context', this))
+    this.set('prompt', new Fixture( id: this._uniqueId() ))
 
   commitPrompt: ->
     fixture = this.get('prompt')
     this.set('prompt', new Fixture( id: this._uniqueId() ))
     this.get('fixtures').add(fixture)
-
-  _initialize: ->
-    this.watch('layout').reactNow((layout) => layout.set('context', this))
-    this.set('prompt', new Fixture( id: this._uniqueId() ))
 
   _uniqueId: -> this.set('_uniqueId', this.get('_uniqueId') + 1)
 

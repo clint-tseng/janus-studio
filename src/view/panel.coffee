@@ -3,8 +3,12 @@ $ = require('jquery')
 
 { Panel } = require('../viewmodel/panel')
 
-class PanelView extends DomView
-  @_dom: -> $('
+layoutAttr = (attr) ->
+  from('context').watch('layout')
+    .and('fixture').watch('id')
+    .all.flatMap((layout, id) -> layout.watch("computed.#{id}.#{attr}"))
+
+PanelView = DomView.build($('
     <div class="panel-wrapper">
       <div class="panel-wrapperToolbar panel-wrapperSubjectControls">
         <a class="panel-var"/>
@@ -16,41 +20,38 @@ class PanelView extends DomView
       </div>
       <div class="panel-contents"/>
     </div>
-  ')
+  '), template(
 
-  layoutAttr = (attr) ->
-    from('context').watch('layout').and('fixture').watch('id').all.flatMap((layout, id) ->
-      layout.watch("computed.#{id}.#{attr}")
-    )
+    find('.panel-wrapper')
+      .css('left', layoutAttr('left'))
+      .css('top', layoutAttr('top'))
+      .css('width', layoutAttr('width'))
+      .css('height', layoutAttr('height'))
 
-  @_template: template(
-    find('.panel-wrapper').css('left', layoutAttr('left'))
-    find('.panel-wrapper').css('top', layoutAttr('top'))
-    find('.panel-wrapper').css('width', layoutAttr('width'))
-    find('.panel-wrapper').css('height', layoutAttr('height'))
+      .classed('minimized', from('minimized'))
 
-    find('.panel-wrapper').classed('minimized', from('minimized'))
+    find('.panel-minimize')
+      .classed('disabled', from('minimized'))
+      .on('click', (_, panel) -> panel.smaller())
 
-    find('.panel-minimize').classed('disabled', from('minimized'))
-    find('.panel-maximize').classed('disabled', from('maximized'))
-    find('.panel-close').classed('disabled', from('has_dependencies'))
+    find('.panel-maximize')
+      .classed('disabled', from('maximized'))
+      .on('click', (_, panel) -> panel.bigger())
+
+    find('.panel-close')
+      .classed('disabled', from('has_dependencies'))
+      .on('click', (event, panel) -> panel.get('fixture').destroy() unless $(event.target).hasClass('disabled'))
 
     find('.panel-contents')
       .render(from('id').and('context').all.flatMap((id, context) -> context.watch("locals.#{id}")))
       .context('panel')
-  )
 
-  _wireEvents: ->
-    dom = this.artifact()
-    panel = this.subject
-
-    dom.find('.panel-minimize').on('click', -> panel.smaller())
-    dom.find('.panel-maximize').on('click', -> panel.bigger())
-    dom.find('.panel-close').on('click', -> panel.get('fixture').destroy() unless $(this).hasClass('disabled'))
-
-    dom.find('.panel-var').on('click', ->
+    find('.panel-var').on('click', (_, panel) ->
       panel.get('context').get('prompt').get('parameters').add(panel.get('id'))
     )
+  )
+)
+
 
 module.exports = {
   PanelView

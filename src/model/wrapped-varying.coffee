@@ -1,8 +1,22 @@
-{ Model, attribute, List, from, Varying } = require('janus')
+{ Model, attribute, bind, List, from, Varying } = require('janus')
 { fix, uniqueId } = require('janus').util
 
 
-class WrappedVarying extends Model
+class WrappedVarying extends Model.build(
+    attribute('observations', class extends attribute.Collection
+      default: -> new List()
+    )
+
+    attribute('reactions', class extends attribute.Collection
+      default: -> new List()
+    )
+
+    bind('derived', from('mapped').and('flattened').all.map((m, f) -> m or f))
+    bind('value', from('_value').map((x) -> if x?.isNothing is true then null else x))
+
+    bind('active_reactions', from('reactions').map((rxns) -> rxns.filter((rxn) -> rxn.watch('active'))))
+  )
+
   isWrappedVarying: true
 
   constructor: (@varying) ->
@@ -30,16 +44,16 @@ class WrappedVarying extends Model
       oldStop = observation.stop
       observation.stop = -> observations.remove(this); oldStop.call(this)
       observations.add(observation)
-    addObservation(r) for r of varying._observers
+    addObservation(r) for _, r of varying._observers
 
     # hijack the react method:
-    if (_react = varying._react)?
+    if (_react = varying._react)? # primitive varying
       varying._react = (f_, immediate) ->
         observation = _react.call(varying, f_, immediate)
         self.unset('parent_reaction')
         addObservation(observation)
         observation
-    else
+    else # derived varying
       varying.react = (f_) ->
         observation = Varying.prototype.react.call(varying, f_)
         self.unset('parent_reaction')
@@ -73,8 +87,11 @@ class WrappedVarying extends Model
     if (_onValue = varying._onValue)?
       varying._onValue = (observation, value, silent) ->
         if (extantRxn = self.get('active_reactions').at(0))?
+          # we already know which reaction chain to log to; do it.
           extantRxn.logChange(self, value)
         else if (extantRxn = self.unset('parent_reaction'))?
+          # we were spawned mid-reaction by a parent WV; it tells us where we are by
+          # setting our parent_reaction. pull it off and set it up properly.
           snapshot = extantRxn.addNode(self)
           latest = extantRxn.get('latest')
           latest.set('new_inner', snapshot) unless latest.get('inner') is snapshot
@@ -97,6 +114,7 @@ class WrappedVarying extends Model
               self.set('inner', value)
               self._trackReactions(value)
               WrappedVarying.hijack(value).set('parent_reaction', extantRxn ? newRxn)
+              # the new varying will onValue as the change propagates down.
             else
               self.unset('inner')
           else
@@ -120,19 +138,7 @@ class WrappedVarying extends Model
           self.set('immediate', result)
         result
 
-  @attribute('observations', class extends attribute.CollectionAttribute
-    default: -> new List()
-  )
-
-  @attribute('reactions', class extends attribute.CollectionAttribute
-    default: -> new List()
-  )
-
-  @bind('derived', from('mapped').and('flattened').all.map((m, f) -> m or f))
-  @bind('value', from('_value').map((x) -> if x?.isNothing is true then null else x))
-
-  @bind('active_reactions', from('reactions').map((rxns) -> rxns.filter((rxn) -> rxn.watch('active'))))
-
+  # called by primitive varyings to begin recording a reaction tree from root.
   _startReaction: (newValue, caller) ->
     rxn = new Reaction(this, caller)
     this.get('reactions').add(rxn)
@@ -156,21 +162,24 @@ class WrappedVarying extends Model
 # to parent, parents, and inner point at SnapshottedVaryings rather than bare
 # ones. This ought to be transparent to all consumers.
 class SnapshottedVarying extends WrappedVarying
-  constructor: (attributes, options) -> Model.prototype.constructor.call(this, attributes, options)
+  constructor: (data, options) ->
+    Model.prototype.constructor.call(this, data, options)
+
   _initialize: -> # a snapshot is inert so no tracking is necessary nor desired.
 
 
-class Reaction extends Model
+class Reaction extends Model.build(
+    attribute('changes', class extends attribute.Collection
+      default: -> new List()
+    )
+    attribute('active', class extends attribute.Boolean
+      default: -> true
+    )
+  )
+
   isReaction: true
 
   constructor: (root, caller) -> super({ root, caller })
-
-  @attribute('changes', class extends attribute.CollectionAttribute
-    default: -> new List()
-  )
-  @attribute('active', class extends attribute.BooleanAttribute
-    default: -> true
-  )
 
   _initialize: ->
     this.set('at', new Date())
@@ -183,7 +192,7 @@ class Reaction extends Model
     if (snapshot = this.getNode(wrapped))?
       return snapshot
 
-    snapshot = new SnapshottedVarying(wrapped.attributes)
+    snapshot = new SnapshottedVarying(wrapped.data)
     this.set("tree.#{wrapped.get('id')}", snapshot)
 
     maybeBuild = (v) => this.addNode(WrappedVarying.hijack(v))

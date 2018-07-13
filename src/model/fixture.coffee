@@ -1,16 +1,16 @@
 { Model, attribute, List, Set, Varying } = require('janus')
 
 # for testing purposes, initially all fixtures are arbitrary code.
-class Fixture extends Model
+Fixture = Model.build(
   # parameters contains the context-unique-id of each dependency.
-  @attribute('parameters', class extends attribute.CollectionAttribute
+  attribute('parameters', class extends attribute.Collection
     default: -> new List()
   )
 
-  @attribute('code', class extends attribute.TextAttribute)
+  attribute('code', class extends attribute.Text)
+)
 
-class Fixtures extends Set
-  @modelClass: Fixture
+Fixtures = Set.of(Fixture)
 
 
 module.exports = { Fixture, Fixtures }

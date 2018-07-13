@@ -1,18 +1,18 @@
-{ Model, attribute, from, Varying, List } = require('janus')
+{ Model, attribute, bind, transient, from, Varying, List } = require('janus')
 
 pct = (x) -> "#{x}%"
 px = (x) -> "#{x}px"
 
-class Layout extends Model
-  @attribute('minimized', class extends attribute.CollectionAttribute
+Layout = Model.build(
+  attribute('minimized', class extends attribute.Collection
     default: -> new List()
   )
-  @attribute('maximized', class extends attribute.CollectionAttribute
+  attribute('maximized', class extends attribute.Collection
     default: -> new List()
   )
 
-  @transient('computed')
-  @bind('computed', from('context').and('context').watch('panels').and('maximized').and('minimized').all.flatMap((context, panels, maximized, minimized) ->
+  transient('computed')
+  bind('computed', from('context').and('context').watch('panels').and('maximized').and('minimized').all.flatMap((context, panels, maximized, minimized) ->
     return {} unless context? and panels?
 
     Varying.flatMapAll(maximized.watchLength(), minimized.watchLength(), panels.watchLength(), (numMaximized, numMinimized, numPanels) ->
@@ -71,6 +71,8 @@ class Layout extends Model
       result
     )
   ))
+)
+
 
 module.exports = { Layout }
 

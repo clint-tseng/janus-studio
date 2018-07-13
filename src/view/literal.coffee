@@ -3,22 +3,18 @@
 
 $ = require('jquery')
 
-class LiteralView extends DomView
-  @_dom: -> $('<span class="janus-literal"/>')
-  @_template: template(
-    find('span').text(from((x) ->
-      if isPrimitive(x) or isArray(x)
-        JSON.stringify(x)
-      else
-        x
-    ))
-  )
+LiteralView = DomView.build($('<span class="janus-literal"/>'), template(
+  find('span').text(from((x) ->
+    if isPrimitive(x) or isArray(x)
+      JSON.stringify(x)
+    else
+      x
+  ))
+))
 
-class NullView extends DomView
-  @_dom: -> $('<span class="janus-literal janus-null">Ø</span>')
-  @_template: template(
-    find('span').attr('title', from((x) -> "#{x}"))
-  )
+NullView = DomView.build($('<span class="janus-literal janus-null">Ø</span>'), template(
+  find('span').attr('title', from((x) -> "#{x}"))
+))
 
 module.exports = {
   LiteralView,

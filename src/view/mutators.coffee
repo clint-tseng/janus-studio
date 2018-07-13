@@ -4,14 +4,11 @@ $ = require('jquery')
 
 { Flyout } = require('../view/flyout')
 
-# TODO: inelegantly copied from janus core (issue #72).
-terminate = (x) -> if x.point? then x else x.all
-
 customMutators = {
   flyout: (data, args = {}) ->
     result = (dom, point) ->
       wrapper = $('<div/>')
-      flyout = new Flyout({ trigger: dom, wrapper, subject_varying: terminate(data).point(point), args })
+      flyout = new Flyout({ trigger: dom, wrapper, subject_varying: data.all.point(point), args })
       mutator = mutators.render(from(new Varying(flyout)))(wrapper, point)
 
       if (oldFlyout = dom.data('flyout'))?
@@ -24,7 +21,7 @@ customMutators = {
       mutator
 
     result.context = (context) -> customMutators.flyout(data, extendNew(args, { context }))
-    result.find = (find) -> customMutators.flyout(data, extendNew(args, { find }))
+    result.criteria = (criteria) -> customMutators.flyout(data, extendNew(args, { criteria }))
     result.options = (options) -> customMutators.flyout(data, extendNew(args, { options }))
     result
 }

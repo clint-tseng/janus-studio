@@ -1,16 +1,15 @@
-{ Model, attribute, DomView, template, find, from } = require('janus')
+{ Model, attribute, bind, DomView, template, find, from } = require('janus')
 { isPrimitive, isArray } = require('janus').util
 
 $ = require('jquery')
 
-class KVPair extends Model
+class KVPair extends Model.build(attribute('edit', attribute.Text))
   constructor: (m, k) -> super({ model: m, key: k })
-  @attribute('edit', attribute.TextAttribute)
 
   _initialize: ->
     value = this.get('model').get(this.get('key'))
     this.set('edit', if isPrimitive(value) or isArray(value) then JSON.stringify(value) else '…')
-    this.watch('edit').react((raw) =>
+    this.watch('edit').reactLater((raw) =>
       try
         result = (new Function("return #{raw};"))()
         this.get('model').set(this.get('key'), result)
@@ -18,8 +17,7 @@ class KVPair extends Model
         console.log("that didn't work..", ex) # TODO: surface this more usefully
     )
 
-class KVPairView extends DomView
-  @_dom: -> $('
+KVPairView = DomView.build($('
     <div class="kvPair">
       <div class="kvPair-key"></div>
       <div class="kvPair-valueBlock">
@@ -27,30 +25,32 @@ class KVPairView extends DomView
         <div class="kvPair-edit"></div>
       </div>
     </div>
-  ')
-  @_template: template(
-    find('.kvPair-key').text(from('key'))
-    find('.kvPair-key').attr('title', from('key'))
-    find('.kvPair-value').render(from('model').and('key').all.flatMap((m, k) -> m.watch(k))).context('debug')
-    find('.kvPair-edit').render(from.attribute('edit')).context('edit').find( attributes: { commit: 'hard' } )
+  '), template(
+    find('.kvPair-key')
+      .text(from('key'))
+      .attr('title', from('key'))
+
+    find('.kvPair-edit').render(from.attribute('edit'))
+      .context('edit')
+      .criteria( attributes: { commit: 'hard' } )
+
+    find('.kvPair-value')
+      .render(from('model').and('key').all.flatMap((m, k) -> m.watch(k)))
+        .context('debug')
+      .on('dblclick', (event, _, __, dom) -> dom.find('.kvPair-edit input').focus().select())
   )
+)
 
-  _wireEvents: ->
-    dom = this.artifact()
-    edit = dom.find('.kvPair-edit input')
-
-    dom.find('.kvPair-value').on('dblclick', -> edit.focus().select())
-
-class ModelViewModel extends Model
-  @attribute 'alignMode', class extends attribute.EnumAttribute
+ModelViewModel = Model.build(
+  attribute('alignMode', class extends attribute.Enum
     values: -> [ 'natural', 'aligned' ]
     default: -> 'natural'
+  )
 
-  @bind('pairs', from('subject').map((m) -> m.enumeration().map((k) -> new KVPair(m, k))))
+  bind('pairs', from('subject').map((m) -> m.enumeration().map((k) -> new KVPair(m, k))))
+)
 
-class ModelView extends DomView
-  @viewModelClass: ModelViewModel
-  @_dom: -> $('
+ModelView = DomView.build($('
     <div class="modelView panel">
       <div class="panel-toolbar">
         <div class="modelView-alignToggle toggleButtons"></div>
@@ -58,17 +58,20 @@ class ModelView extends DomView
       <div class="panel-title"></div>
       <div class="panel-main modelView-pairs"></div>
     </div>
-  ')
-  @_template: template(
+  '), template(
+
     find('.modelView-alignToggle').render(from.attribute('alignMode'))
       .context('edit')
-      .find( attributes: { style: 'list' } )
+      .criteria( attributes: { style: 'list' } )
       .options( renderItem: (x) -> x.context('icon') )
+
     find('.modelView').classGroup('align-', from('alignMode'))
 
     find('.panel-title').text(from('subject').map((x) -> x.constructor.name))
     find('.modelView-pairs').render(from('pairs'))
-  )
+
+  ), { viewModelClass: ModelViewModel }
+)
 
 module.exports = {
   KVPair, KVPairView, ModelViewModel, ModelView,
