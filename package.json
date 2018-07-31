@@ -20,7 +20,16 @@
   "engines": {
     "node": ">= 6.0"
   },
-  "keywords": [ "framework", "server-side", "mvvm", "frp", "rx", "application", "508", "seo" ],
+  "keywords": [
+    "framework",
+    "server-side",
+    "mvvm",
+    "frp",
+    "rx",
+    "application",
+    "508",
+    "seo"
+  ],
   "dependencies": {
     "janus": "~0",
     "janus-stdlib": "~0",
@@ -28,11 +37,11 @@
     "jquery": "~3",
     "coffee-script": "~1.12",
     "livescript": "~1.5",
-    "moment": "~2.17.1"
+    "luxon": "~1"
   },
   "devDependencies": {
     "node-sass": "~3",
-    "mocha": "~3",
+    "mocha": "~5",
     "should": "~11"
   }
 }

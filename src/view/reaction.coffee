@@ -1,12 +1,12 @@
 { Model, bind, DomView, template, find, from } = require('janus')
 $ = require('jquery')
-moment = require('moment')
+{ DateTime } = require('luxon')
 
 { Reaction } = require('../model/wrapped-varying')
 
 
 ReactionVM = Model.build(
-  bind('at', from('subject').watch('at').map(moment))
+  bind('at', from('subject').watch('at').map(DateTime.fromJSDate))
   bind('change_count', from('subject').watch('changes').flatMap((cs) -> cs.watchLength()))
   bind('target', from('settings.target').and('subject').all.flatMap((target, subject) ->
     if target?
@@ -36,8 +36,8 @@ ReactionView = DomView.build($('
     </div>
   '), template(
 
-    find('.time .minor').text(from('at').map((t) -> t.format("HH:mm:")))
-    find('.time .major').text(from('at').map((t) -> t.format("ss.SS")))
+    find('.time .minor').text(from('at').map((t) -> t.toFormat("HH:mm:")))
+    find('.time .major').text(from('at').map((t) -> t.toFormat("ss.SSS")))
 
     find('.reaction-inspectionTarget .reaction-part-id').text(from('target').watch('id').map((id) -> "##{id}"))
     find('.reaction-inspectionTarget .reaction-part-delta').render(from('target')).context('delta')
