@@ -9,7 +9,7 @@ class KVPair extends Model.build(attribute('edit', attribute.Text))
   _initialize: ->
     value = this.get('model').get(this.get('key'))
     this.set('edit', if isPrimitive(value) or isArray(value) then JSON.stringify(value) else '…')
-    this.watch('edit').reactLater((raw) =>
+    this.watch('edit').react(false, (raw) =>
       try
         result = (new Function("return #{raw};"))()
         this.get('model').set(this.get('key'), result)
@@ -32,7 +32,7 @@ KVPairView = DomView.build($('
 
     find('.kvPair-edit').render(from.attribute('edit'))
       .context('edit')
-      .criteria( attributes: { commit: 'hard' } )
+      .criteria( commit: 'hard' )
 
     find('.kvPair-value')
       .render(from('model').and('key').all.flatMap((m, k) -> m.watch(k)))
@@ -62,7 +62,7 @@ ModelView = DomView.build($('
 
     find('.modelView-alignToggle').render(from.attribute('alignMode'))
       .context('edit')
-      .criteria( attributes: { style: 'list' } )
+      .criteria( style: 'list' )
       .options( renderItem: (x) -> x.context('icon') )
 
     find('.modelView').classGroup('align-', from('alignMode'))

@@ -48,7 +48,7 @@ class FixtureBinding extends Model
     super()
 
 class Context extends Model.build(
-    attribute('fixtures', class extends attribute.Collection
+    attribute('fixtures', class extends attribute.List
       default: -> new Fixtures()
     )
 

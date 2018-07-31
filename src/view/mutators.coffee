@@ -1,5 +1,4 @@
 { Varying, find, from, mutators } = require('janus')
-{ extendNew } = require('janus').util
 $ = require('jquery')
 
 { Flyout } = require('../view/flyout')
@@ -20,11 +19,11 @@ customMutators = {
       dom.on('mouseenter.flyout', -> flyout.trigger()) # TODO: is this better done in some wireEvents? which?
       mutator
 
-    result.context = (context) -> customMutators.flyout(data, extendNew(args, { context }))
-    result.criteria = (criteria) -> customMutators.flyout(data, extendNew(args, { criteria }))
-    result.options = (options) -> customMutators.flyout(data, extendNew(args, { options }))
+    result.context = (context) -> customMutators.flyout(data, Object.assign({}, args, { context }))
+    result.criteria = (criteria) -> customMutators.flyout(data, Object.assign({}, args, { criteria }))
+    result.options = (options) -> customMutators.flyout(data, Object.assign({}, args, { options }))
     result
 }
 
-module.exports = find.build(extendNew(mutators, customMutators))
+module.exports = find.build(Object.assign({}, mutators, customMutators))
 

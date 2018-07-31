@@ -1,5 +1,5 @@
 { Model, bind, DomView, template, find, from } = require('janus')
-{ sticky } = require('janus-stdlib').util.varying
+{ sticky } = require('janus-stdlib').varying
 $ = require('jquery')
 
 class Flyout extends Model.build(
@@ -39,7 +39,7 @@ class FlyoutView extends DomView.build($('
     wrapper = flyout.get('wrapper')
     body = $('body')
 
-    this.subject.watch('delayed_active').reactLater((show) =>
+    this.subject.watch('delayed_active').react(false, (show) =>
       if show is true
         body.append(dom)
 

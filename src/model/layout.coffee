@@ -4,10 +4,10 @@ pct = (x) -> "#{x}%"
 px = (x) -> "#{x}px"
 
 Layout = Model.build(
-  attribute('minimized', class extends attribute.Collection
+  attribute('minimized', class extends attribute.List
     default: -> new List()
   )
-  attribute('maximized', class extends attribute.Collection
+  attribute('maximized', class extends attribute.List
     default: -> new List()
   )
 

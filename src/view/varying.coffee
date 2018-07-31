@@ -106,7 +106,7 @@ class VaryingPanel extends Model.build(
 
   _initialize: ->
     # create or destroy our own hollow observation:
-    this.watch('subscribed').reactLater((subbed) =>
+    this.watch('subscribed').react(false, (subbed) =>
       if subbed
         this._observation = this.get('subject').react(->)
       else
@@ -139,14 +139,14 @@ VaryingView = DomView.build($('
 
     find('.varyingView-subscriptionToggle').classed('checked', from('subscribed'))
     find('.varyingView-subscriptionToggle .switch').render(from.attribute('subscribed'))
-      .context('edit').criteria( attributes: { style: 'button' } )
+      .context('edit').criteria( style: 'button' )
 
     find('.varyingView-tree').render(from('wrapped').and('active_reaction').all.flatMap((wv, ar) ->
       if ar? then wv.watch('id').flatMap((id) -> ar.watch("tree.#{id}")) else wv
     )).context('tree')
 
     find('.varyingView-reactions').render(from.attribute('active_reaction'))
-      .context('edit').criteria( attributes: { style: 'list' } )
+      .context('edit').criteria( style: 'list' )
       .options(from('wrapped').map((wv) -> { renderItem: (x) -> x.options( settings: { target: wv } ) }))
 
     find('.panel-subtitle').classed('hide', from('active_reaction').map((ar) -> !ar?))

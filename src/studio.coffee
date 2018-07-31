@@ -2,7 +2,7 @@
 $ = require('jquery')
 window.jQuery = window.$ = $
 
-{ App, Library } = require('janus').application
+{ App, Library } = require('janus')
 stdlib = require('janus-stdlib')
 
 defer = (f) -> setTimeout(f, 0)
@@ -20,12 +20,10 @@ require('./view/reaction').registerWith(views)
 require('./view/list').registerWith(views)
 require('./view/context').registerWith(views)
 require('./view/panel').registerWith(views)
-stores = new Library()
 
-{ Global } = require('./model/global')
-global = new Global()
+resolvers = new Library()
 
-app = new App({ views, stores, global })
+app = new App({ views, resolvers })
 
 $ -> defer ->
   { List } = require('janus')
@@ -40,7 +38,7 @@ $ -> defer ->
     _uniqueId: 2
   )
 
-  contextView = app.vendView(context)
+  contextView = app.view(context)
   $('#main').append(contextView.artifact())
   contextView.wireEvents()
 

@@ -30,7 +30,7 @@ ContextView = DomView.build($('
 
     find('.prompt-textContainer')
       .render(from('prompt').map((p) -> p.attribute('code')))
-        .context('edit').criteria( attributes: { style: 'multiline' } )
+        .context('edit').criteria( style: 'multiline' )
       .on('keydown', 'textarea', (event, context) -> context.commitPrompt() if event.which is 13)
   )
 )

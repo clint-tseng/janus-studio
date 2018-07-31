@@ -16,7 +16,6 @@ KVEditView = DomView.build($('<input type="text"/>'), template(
 
 module.exports = {
   KVEditView,
-  registerWith: (library) -> library.register(attribute.Text, KVEditView,
-    context: 'edit', attributes: { commit: 'hard' })
+  registerWith: (library) -> library.register(attribute.Text, KVEditView, context: 'edit', commit: 'hard')
 }
 

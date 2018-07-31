@@ -3,7 +3,7 @@
 # for testing purposes, initially all fixtures are arbitrary code.
 Fixture = Model.build(
   # parameters contains the context-unique-id of each dependency.
-  attribute('parameters', class extends attribute.Collection
+  attribute('parameters', class extends attribute.List
     default: -> new List()
   )
 

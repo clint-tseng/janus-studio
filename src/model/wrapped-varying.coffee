@@ -3,11 +3,11 @@
 
 
 class WrappedVarying extends Model.build(
-    attribute('observations', class extends attribute.Collection
+    attribute('observations', class extends attribute.List
       default: -> new List()
     )
 
-    attribute('reactions', class extends attribute.Collection
+    attribute('reactions', class extends attribute.List
       default: -> new List()
     )
 
@@ -169,7 +169,7 @@ class SnapshottedVarying extends WrappedVarying
 
 
 class Reaction extends Model.build(
-    attribute('changes', class extends attribute.Collection
+    attribute('changes', class extends attribute.List
       default: -> new List()
     )
     attribute('active', class extends attribute.Boolean
