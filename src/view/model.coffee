@@ -50,7 +50,7 @@ ModelViewModel = Model.build(
   bind('pairs', from('subject').map((m) -> m.enumeration().map((k) -> new KVPair(m, k))))
 )
 
-ModelView = DomView.build($('
+ModelView = DomView.withOptions({ viewModelClass: ModelViewModel }).build($('
     <div class="modelView panel">
       <div class="panel-toolbar">
         <div class="modelView-alignToggle toggleButtons"></div>
@@ -70,7 +70,7 @@ ModelView = DomView.build($('
     find('.panel-title').text(from('subject').map((x) -> x.constructor.name))
     find('.modelView-pairs').render(from('pairs'))
 
-  ), { viewModelClass: ModelViewModel }
+  )
 )
 
 module.exports = {

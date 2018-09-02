@@ -17,7 +17,7 @@ ReactionVM = Model.build(
   bind('root', from('target').and('subject').watch('root').all.map((t, r) -> r unless t is r))
 )
 
-ReactionView = DomView.build($('
+ReactionView = DomView.withOptions({ viewModelClass: ReactionVM }).build($('
     <div class="reaction">
       <div class="time"><span class="minor"/><span class="major"/></div>
 
@@ -48,7 +48,7 @@ ReactionView = DomView.build($('
     find('.reaction-root').classed('hide', from('root').map((r) -> !r?))
     find('.reaction-root .reaction-part-id').text(from('root').watch('id').map((id) -> "##{id}"))
     find('.reaction-root .reaction-part-delta').render(from('root')).context('delta')
-  ), { viewModelClass: ReactionVM }
+  )
 )
 
 

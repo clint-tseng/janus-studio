@@ -113,7 +113,7 @@ class VaryingPanel extends Model.build(
         this._observation.stop()
     )
 
-VaryingView = DomView.build($('
+VaryingView = DomView.withOptions({ viewModelClass: VaryingPanel }).build($('
     <div class="varyingView panel hasSidebar">
       <div class="panel-toolbar">
         <ul class="varyingView-subscriptionToggle toggleSwitch">
@@ -153,7 +153,7 @@ VaryingView = DomView.build($('
     find('.panel-subtitleText').text(from('active_reaction').watch('root').watch('id').map((id) -> "Reaction @##{id}"))
 
     find('.panel-subtitleClose').on('click', (_, subject) => subject.unset('active_reaction'))
-  ), { viewModelClass: VaryingPanel }
+  )
 )
 
 

@@ -45,7 +45,7 @@ class Mapping extends Model.build(
     this.set('mapping', varying._f)
     this.set('arguments.names', new List(getArguments(varying._f)))
 
-MappingView = DomView.build($('
+MappingView = DomView.withOptions({ viewModelClass: Mapping }).build($('
     <div class="mapping">
       <div class="mapping-toolbar">
         <div class="mapping-debug" title="Step debug with these arguments" />
@@ -76,7 +76,7 @@ MappingView = DomView.build($('
       else if (parent = wrapped.get('parent'))?
         exec(wrapped.get('target')._f, [ valueOf(parent) ])
     )
-  ), { viewModelClass: Mapping }
+  )
 )
 
 
